@@ -5,12 +5,20 @@
 ;;;
 ;;; 1. An in-package form has been added.
 ;;;
-;;; 2. All enum definitions are handled by the groveller.
+;;; 2. The libstarpu CFFI library is being defined.
 ;;;
-;;; 3. All constant definitions are handled by the groveller.
+;;; 3. All enum definitions are handled by the groveller.
+;;;
+;;; 4. All constant definitions are handled by the groveller.
 ;;; %s/(cl:defconstant \([A-Z_]+\).+)/(constant (\1 "\1"))/g
 
 (in-package #:cl-starpu)
+
+(cffi:define-foreign-library libstarpu
+  (:unix (:or "libstarpu-1.3.so" "libstarpu-1.3.so.2"))
+  (t (:default "libstarpu-1.3")))
+
+(cffi:use-foreign-library libstarpu)
 
 (cffi:defcfun ("starpu_pthread_mutex_lock_sched" starpu_pthread_mutex_lock_sched) :int
   (mutex :pointer))
