@@ -1,0 +1,5 @@
+#+TITLE: A Common Lisp Interface for StarPU
+
+This library provides a convenient interface to StarPU task programming
+library.  StarPU automatically manages scheduling, memory management, and
+execution of task graphs, across a wide range of devices, including GPUs.
