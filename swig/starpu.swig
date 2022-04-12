@@ -1,8 +1,10 @@
 %module starpu
 
+%feature("intern_function", "1");
+
 %include "starpu/1.3/starpu_config.h"
 %include "starpu/1.3/starpu_util.h"
-%include "tweaks.h"
+%include "cl-starpu-tweaks.h"
 %include "starpu/1.3/starpu_thread.h"
 %include "starpu/1.3/starpu_thread_util.h"
 %include "starpu/1.3/starpu_data.h"

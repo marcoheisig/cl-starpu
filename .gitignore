@@ -1,1 +1,2 @@
 swig/starpu.lisp
+swig/swig-interface.lisp
