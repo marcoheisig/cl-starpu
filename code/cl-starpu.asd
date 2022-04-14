@@ -7,7 +7,8 @@
   :depends-on
   ("alexandria"
    "bordeaux-threads"
-   "cffi")
+   "cffi"
+   "trivial-garbage")
   :in-order-to ((test-op (test-op "cl-starpu-test-suite")))
   :serial t
   :components
@@ -15,4 +16,6 @@
    (:file "swig-lispify")
    (:cffi-grovel-file "grovel")
    (:file "swig-interface")
-   (:file "starpu")))
+   (:file "starpu")
+   (:file "codelet")
+   (:file "hello")))

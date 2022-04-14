@@ -67,20 +67,3 @@
 
 (defun starpu-wait-initialized ()
   (%starpu-wait-initialized))
-
-(cffi:defcallback hello :void ((buffers :pointer) (cl_arg :pointer))
-  (declare (ignore buffers cl_arg))
-  (format t "~&BAM!~%"))
-
-(defun hello-world ()
-  (starpu-init)
-  (cffi:with-foreign-object (cl '(:struct starpu-codelet-cstruct))
-    (setf (cffi:foreign-slot-value cl '(:struct starpu-codelet-cstruct) 'nbuffers-slot)
-          0)
-    (setf (cffi:mem-ref (cffi:foreign-slot-pointer cl '(:struct starpu-codelet-cstruct) 'cpu-funcs-slot)
-                        :pointer 0)
-          (cffi:callback hello))
-    (let ((task (%starpu-task-create)))
-      (setf (cffi:foreign-slot-value task '(:struct starpu-task-cstruct) 'cl-slot)
-            cl)
-      (%starpu-task-submit task))))
