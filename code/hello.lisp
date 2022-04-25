@@ -4,14 +4,11 @@
   (declare (ignore buffers cl_arg))
   (format t "~&BAM!~%"))
 
-(defun hello-world ()
+(defun hello ()
   (starpu-init)
-  (let ((codelet (make-instance 'sequential-codelet
+  (let ((codelet (make-instance 'codelet
                    :name "hello"
                    :number-of-buffers 0)))
     (setf (codelet-cpu-func codelet 0)
           (cffi:callback hello))
-    (let ((task (%starpu-task-create)))
-      (setf (cffi:foreign-slot-value task '(:struct starpu-task-cstruct) 'cl-slot)
-            (codelet-handle codelet))
-      (%starpu-task-submit task))))
+    (starpu-task-insert codelet)))

@@ -17,5 +17,7 @@
    (:cffi-grovel-file "grovel")
    (:file "swig-interface")
    (:file "starpu")
+   (:file "data")
    (:file "codelet")
+   (:file "task")
    (:file "hello")))

@@ -9,6 +9,8 @@
 
 (defgeneric codelet-name (codelet))
 
+(defgeneric codelet-type (codelet))
+
 (defgeneric codelet-max-parallelism (codelet))
 
 (defgeneric codelet-can-execute (codelet))
@@ -18,8 +20,6 @@
 (defgeneric codelet-cuda-func (codelet index))
 
 (defgeneric codelet-opencl-func (codelet index))
-
-(defgeneric codelet-fpga-func (codelet index))
 
 (defgeneric codelet-performance-model (codelet))
 
@@ -38,8 +38,6 @@
 (defgeneric (setf codelet-cuda-func) (value codelet index))
 
 (defgeneric (setf codelet-opencl-func) (value codelet index))
-
-(defgeneric (setf codelet-fpga-func) (value codelet index))
 
 (defgeneric (setf codelet-performance-model) (value codelet))
 
@@ -62,15 +60,6 @@
     :type unsigned-byte
     :accessor codelet-number-of-buffers)))
 
-(defclass sequential-codelet (codelet)
-  ())
-
-(defclass spmd-codelet (codelet)
-  ())
-
-(defclass fork-join-codelet (codelet)
-  ())
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;; Slot Access Macros
@@ -86,6 +75,9 @@
 
 (defmacro codelet-handle-name (handle)
   `(codelet-handle-slot-ref ,handle 'name-slot))
+
+(defmacro codelet-handle-type (handle)
+  `(codelet-handle-slot-ref ,handle 'type-slot))
 
 (defmacro codelet-handle-max-parallelism (handle)
   `(codelet-handle-slot-ref ,handle 'max-parallelism-slot))
@@ -110,9 +102,6 @@
 
 (defmacro codelet-handle-opencl-func (handle index)
   `(codelet-handle-slot-aref ,handle 'opencl-funcs-slot :pointer ,index))
-
-(defmacro codelet-handle-fpga-func (handle index)
-  `(codelet-handle-slot-aref ,handle 'fpga-funcs-slot :pointer ,index))
 
 (defmacro codelet-handle-nbuffers (handle)
   `(codelet-handle-slot-ref ,handle 'nbuffers-slot))
@@ -140,9 +129,12 @@
      &key
        (name (gensym "CODELET-"))
        (max-parallelism nil max-parallelism-supplied-p)
-       (number-of-buffers 0))
+       (number-of-buffers 0)
+       (type :seq))
   (setf (codelet-name codelet)
         name)
+  (setf (codelet-type codelet)
+        type)
   (when max-parallelism-supplied-p
     (setf (codelet-max-parallelism codelet)
           max-parallelism))
@@ -151,8 +143,14 @@
   (call-next-method))
 
 (defmethod print-object ((codelet codelet) stream)
-  (print-unreadable-object (codelet stream :type t :identity t)
-    (format stream "~S" (codelet-name codelet))))
+  (print-unreadable-object (codelet stream :type t)
+    (format stream "~@<~@{~S ~S~^ ~_~}~:>"
+            :name (codelet-name codelet)
+            :type (codelet-type codelet)
+            :number-of-buffers (codelet-number-of-buffers codelet))))
+
+(defmethod codelet-type (codelet)
+  (codelet-handle-type (codelet-handle codelet)))
 
 (defmethod codelet-max-parallelism (codelet)
   (codelet-handle-max-parallelism (codelet-handle codelet)))
@@ -172,10 +170,6 @@
   (check-type index (integer 0 (#.+starpu-maximplementations+)))
   (codelet-handle-opencl-func (codelet-handle codelet) index))
 
-(defmethod codelet-fpga-func (codelet index)
-  (check-type index (integer 0 (#.+starpu-maximplementations+)))
-  (codelet-handle-fpga-func (codelet-handle codelet) index))
-
 (defmethod codelet-performance-model (codelet)
   (codelet-handle-performance-model (codelet-handle codelet)))
 
@@ -186,6 +180,10 @@
   (symbol-macrolet ((ptr (codelet-handle-name (codelet-handle codelet))))
     (cffi:foreign-string-free ptr))
   (setf ptr (cffi:foreign-string-alloc (string value))))
+
+(defmethod (setf codelet-type) (value codelet)
+  (setf (codelet-handle-type (codelet-handle codelet))
+        value))
 
 (defmethod (setf codelet-cpu-func) (value codelet index)
   (check-type index (integer 0 (#.+starpu-maximplementations+)))
@@ -202,11 +200,6 @@
   (setf (codelet-handle-opencl-func (codelet-handle codelet) index)
         value))
 
-(defmethod (setf codelet-fpga-func) (value codelet index)
-  (check-type index (integer 0 (#.+starpu-maximplementations+)))
-  (setf (codelet-handle-fpga-func (codelet-handle codelet) index)
-        value))
-
 (defmethod (setf codelet-performance-model) (value codelet)
   (setf (codelet-handle-performance-model (codelet-handle codelet))
         value))
@@ -217,6 +210,6 @@
 
 (defmethod (setf codelet-number-of-buffers) :after (value codelet)
   (setf (codelet-handle-nbuffers (codelet-handle codelet))
-        (if (< value +starpu-nmaxbufs+)
+        (if (<= value +starpu-nmaxbufs+)
             value
             +starpu-variable-nbuffers+)))

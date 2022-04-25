@@ -431,7 +431,26 @@
 
 (cstruct #.(swig-lispify "starpu_task" 'classname) "struct starpu_task"
          (#.(swig-lispify "name" 'slotname) "name" :type (:pointer :char))
-         (#.(swig-lispify "cl" 'slotname) "cl" :type :pointer))
+         (#.(swig-lispify "cl" 'slotname) "cl" :type :pointer)
+         (#.(swig-lispify "where" 'slotname) "where" :type :int32)
+         (#.(swig-lispify "nbuffers" 'slotname) "nbuffers" :type :int)
+         (#.(swig-lispify "dyn_handles" 'slotname) "dyn_handles" :type :pointer)
+         (#.(swig-lispify "dyn_interfaces" 'slotname) "dyn_interfaces" :type :pointer)
+         (#.(swig-lispify "dyn_modes" 'slotname) "dyn_modes" :type :pointer)
+         (#.(swig-lispify "handles" 'slotname) "handles" :type :pointer :count STARPU_NMAXBUFS)
+         (#.(swig-lispify "interfaces" 'slotname) "interfaces" :type :pointer :count STARPU_NMAXBUFS)
+         (#.(swig-lispify "modes" 'slotname) "modes" :type (:pointer #.(swig-lispify "starpu_data_access_mode" 'enumname)) :count STARPU_NMAXBUFS)
+         (#.(swig-lispify "cl_arg" 'slotname) "cl_arg" :type :pointer)
+         (#.(swig-lispify "cl_arg_size" 'slotname) "cl_arg_size" :type :size)
+         (#.(swig-lispify "callback_func" 'slotname) "callback_func" :type :pointer)
+         (#.(swig-lispify "callback_arg" 'slotname) "callback_arg" :type :pointer)
+         (#.(swig-lispify "status" 'slotname) "status" :type  #.(swig-lispify "starpu_task_status" 'enumname))
+         (#.(swig-lispify "type" 'slotname) "type" :type :unsigned-int)
+         (#.(swig-lispify "color" 'slotname) "color" :type :unsigned-int)
+         (#.(swig-lispify "flops" 'slotname) "flops" :type :double)
+         (#.(swig-lispify "predicted" 'slotname) "predicted" :type :double)
+         (#.(swig-lispify "predicted_transfer" 'slotname) "predicted_transfer" :type :double)
+         (#.(swig-lispify "predicted_start" 'slotname) "predicted_start" :type :double))
 
 (cstruct #.(swig-lispify "starpu_sched_ctx_iterator" 'classname) "struct starpu_sched_ctx_iterator")
 
