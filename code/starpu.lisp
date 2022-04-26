@@ -1,5 +1,7 @@
 (in-package #:cl-starpu)
 
+(defvar *ctx*) ; TODO
+
 (defun version ()
   (cffi:with-foreign-objects ((major :int)
                               (minor :int)
@@ -60,7 +62,12 @@
         (process-boolean-option disable-asynchronous-opencl-copy disable-asynchronous-opencl-copy-slot)
         (process-boolean-option disable-asynchronous-mic-copy disable-asynchronous-mic-copy-slot))
       ;; Actually initialize.
-      (%starpu-init conf))))
+      (let ((ret (%starpu-init conf)))
+        ;; Handle errors.
+        (unless (zerop ret)
+          (if (= ret (- +enodev+))
+              (error 'no-worker-available :error-code ret)
+              (error 'starpu-error :error-code ret)))))))
 
 (defun shutdown ()
   (%starpu-shutdown))

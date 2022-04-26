@@ -4,6 +4,8 @@
 
 (include "starpu.h")
 
+(constant (#.(swig-lispify "ENODEV" 'constant) "ENODEV"))
+
 (constant (#.(swig-lispify "STARPU_MAJOR_VERSION" 'constant) "STARPU_MAJOR_VERSION"))
 
 (constant (#.(swig-lispify "STARPU_MINOR_VERSION" 'constant) "STARPU_MINOR_VERSION"))
