@@ -27,6 +27,10 @@
 
 (defgeneric codelet-number-of-buffers (codelet))
 
+(defgeneric codelet-mode (codelet index))
+
+(defgeneric codelet-modes (codelet))
+
 (defgeneric (setf codelet-name) (value codelet))
 
 (defgeneric (setf codelet-max-parallelism) (value codelet))
@@ -45,20 +49,24 @@
 
 (defgeneric (setf codelet-number-of-buffers) (value codelet))
 
+(defgeneric (setf codelet-mode) (value codelet index))
+
+(defgeneric (setf codelet-modes) (value codelet))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;; Classes
 
 (defclass codelet ()
-  ((name
+  ((%name
     :type (or symbol string)
     :accessor codelet-name)
-   (handle
+   (%handle
     :type cffi:foreign-pointer
     :accessor codelet-handle)
-   (number-of-buffers
+   (%number-of-buffers
     :type unsigned-byte
-    :accessor codelet-number-of-buffers)))
+    :reader codelet-number-of-buffers)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -106,6 +114,12 @@
 (defmacro codelet-handle-nbuffers (handle)
   `(codelet-handle-slot-ref ,handle 'nbuffers-slot))
 
+(defmacro codelet-handle-mode (handle index)
+  `(codelet-handle-slot-aref ,handle 'modes-slot 'starpu-data-access-mode ,index))
+
+(defmacro codelet-handle-dyn-modes (handle)
+  `(codelet-handle-slot-ref ,handle 'dyn-modes-slot))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;; Methods
@@ -130,7 +144,7 @@
      &key
        (name (gensym "CODELET-"))
        (max-parallelism nil max-parallelism-supplied-p)
-       (number-of-buffers 0)
+       (modes '())
        (type :seq)
        . #.
        (loop for index below +starpu-maximplementations+
@@ -156,11 +170,11 @@
         name)
   (setf (codelet-type codelet)
         type)
+  (setf (codelet-modes codelet)
+        modes)
   (when max-parallelism-supplied-p
     (setf (codelet-max-parallelism codelet)
           max-parallelism))
-  (setf (codelet-number-of-buffers codelet)
-        number-of-buffers)
   (call-next-method))
 
 (defmethod print-object ((codelet codelet) stream)
@@ -168,7 +182,7 @@
     (format stream "~@<~@{~S ~S~^ ~_~}~:>"
             :name (codelet-name codelet)
             :type (codelet-type codelet)
-            :number-of-buffers (codelet-number-of-buffers codelet))))
+            :modes (codelet-modes codelet))))
 
 (defmethod codelet-type (codelet)
   (codelet-handle-type (codelet-handle codelet)))
@@ -196,6 +210,15 @@
 
 (defmethod codelet-energy-model (codelet)
   (codelet-handle-energy-model (codelet-handle codelet)))
+
+(defmethod codelet-mode (codelet index)
+  (assert (< index (codelet-number-of-buffers codelet)))
+  (codelet-handle-mode (codelet-handle codelet) index))
+
+(defmethod codelet-modes (codelet)
+  (let ((handle (codelet-handle codelet)))
+    (loop for index below (codelet-number-of-buffers codelet)
+          collect (codelet-handle-mode handle index))))
 
 (defmethod (setf codelet-name) :after (value codelet)
   (symbol-macrolet ((ptr (codelet-handle-name (codelet-handle codelet))))
@@ -229,8 +252,19 @@
   (setf (codelet-handle-energy-model (codelet-handle codelet))
         value))
 
-(defmethod (setf codelet-number-of-buffers) :after (value codelet)
-  (setf (codelet-handle-nbuffers (codelet-handle codelet))
-        (if (<= value +starpu-nmaxbufs+)
-            value
-            +starpu-variable-nbuffers+)))
+(defmethod (setf codelet-mode) (mode codelet index)
+  (assert (< index (codelet-number-of-buffers codelet)))
+  (setf (codelet-handle-mode (codelet-handle codelet) index)
+        mode))
+
+(defmethod (setf codelet-modes) (modes codelet)
+  (let ((n (length modes))
+        (handle (codelet-handle codelet)))
+    (setf (slot-value codelet '%number-of-buffers) n)
+    (if (<= n +starpu-nmaxbufs+)
+        (progn
+          (setf (codelet-handle-nbuffers handle) n)
+          (loop for mode in modes for index below n do
+            (setf (codelet-handle-mode handle index)
+                  mode)))
+        (break "TODO"))))

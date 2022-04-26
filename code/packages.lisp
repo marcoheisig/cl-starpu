@@ -11,6 +11,14 @@
    #:pause
    #:resume
    #:shutdown
+   ;; Data Handle
+   #:data-handle
+   #:data-handle-p
+   ;; Vector Handle
+   #:vector-handle
+   #:vector-handle-p
+   #:vector-handle-vector
+   #:make-vector-handle
    ;; Codelet
    #:codelet
    #:codeletp

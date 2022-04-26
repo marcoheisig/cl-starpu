@@ -448,28 +448,28 @@
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (ld :pointer)
-  (nx :pointer)
-  (ny :pointer)
-  (elemsize :pointer))
+  (ld :uint32)
+  (nx :uint32)
+  (ny :uint32)
+  (elemsize :size))
 
 (cffi:defcfun ("starpu_matrix_data_register_allocsize" #.(swig-lispify "starpu_matrix_data_register_allocsize" 'function)) :void
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (ld :pointer)
-  (nx :pointer)
-  (ny :pointer)
-  (elemsize :pointer)
-  (allocsize :pointer))
+  (ld :uint32)
+  (nx :uint32)
+  (ny :uint32)
+  (elemsize :size)
+  (allocsize :size))
 
 (cffi:defcfun ("starpu_matrix_ptr_register" #.(swig-lispify "starpu_matrix_ptr_register" 'function)) :void
   (handle :pointer)
   (node :unsigned-int)
   (ptr :pointer)
   (dev_handle :pointer)
-  (offset :pointer)
-  (ld :pointer))
+  (offset :size)
+  (ld :uint32))
 
 (cffi:defcfun ("starpu_matrix_get_nx" #.(swig-lispify "starpu_matrix_get_nx" 'function)) :pointer
   (handle :pointer))
@@ -510,12 +510,12 @@
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (ldy :pointer)
-  (ldz :pointer)
-  (nx :pointer)
-  (ny :pointer)
-  (nz :pointer)
-  (elemsize :pointer))
+  (ldy :uint32)
+  (ldz :uint32)
+  (nx :uint32)
+  (ny :uint32)
+  (nz :uint32)
+  (elemsize :size))
 
 (cffi:defcfun ("starpu_block_ptr_register" #.(swig-lispify "starpu_block_ptr_register" 'function)) :void
   (handle :pointer)
@@ -523,8 +523,8 @@
   (ptr :pointer)
   (dev_handle :pointer)
   (offset :pointer)
-  (ldy :pointer)
-  (ldz :pointer))
+  (ldy :uint32)
+  (ldz :uint32))
 
 (cffi:defcfun ("starpu_block_get_nx" #.(swig-lispify "starpu_block_get_nx" 'function)) :pointer
   (handle :pointer))
@@ -554,31 +554,31 @@
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (nx :pointer)
-  (elemsize :pointer))
+  (nx :uint32)
+  (elemsize :size))
 
 (cffi:defcfun ("starpu_vector_data_register_allocsize" #.(swig-lispify "starpu_vector_data_register_allocsize" 'function)) :void
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (nx :pointer)
-  (elemsize :pointer)
-  (allocsize :pointer))
+  (nx :uint32)
+  (elemsize :size)
+  (allocsize :size))
 
 (cffi:defcfun ("starpu_vector_ptr_register" #.(swig-lispify "starpu_vector_ptr_register" 'function)) :void
   (handle :pointer)
   (node :unsigned-int)
   (ptr :pointer)
   (dev_handle :pointer)
-  (offset :pointer))
+  (offset :size))
 
-(cffi:defcfun ("starpu_vector_get_nx" #.(swig-lispify "starpu_vector_get_nx" 'function)) :pointer
+(cffi:defcfun ("starpu_vector_get_nx" #.(swig-lispify "starpu_vector_get_nx" 'function)) :uint32
   (handle :pointer))
 
-(cffi:defcfun ("starpu_vector_get_elemsize" #.(swig-lispify "starpu_vector_get_elemsize" 'function)) :pointer
+(cffi:defcfun ("starpu_vector_get_elemsize" #.(swig-lispify "starpu_vector_get_elemsize" 'function)) :size
   (handle :pointer))
 
-(cffi:defcfun ("starpu_vector_get_allocsize" #.(swig-lispify "starpu_vector_get_allocsize" 'function)) :pointer
+(cffi:defcfun ("starpu_vector_get_allocsize" #.(swig-lispify "starpu_vector_get_allocsize" 'function)) :size
   (handle :pointer))
 
 (cffi:defcfun ("starpu_vector_get_local_ptr" #.(swig-lispify "starpu_vector_get_local_ptr" 'function)) :pointer

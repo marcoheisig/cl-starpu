@@ -150,7 +150,7 @@
 ;;;
 ;;; Functions
 
-(defmacro starpu-task-insert
+(defmacro task-insert
     (codelet &rest args
      &key . #1=#.
        (mapcar
@@ -164,9 +164,9 @@
            :task-deps-array :task-color :task-synchronous :task-end-dep)
           cffi:*built-in-foreign-types*)))
   (declare (ignore . #1#))
-  (parse-starpu-task-insert-form codelet args))
+  (parse-task-insert codelet args))
 
-(defun parse-starpu-task-insert-form (codelet args)
+(defun parse-task-insert (codelet args)
   (let* ((reversed-bindings '())
          (reversed-args '())
          (reversed-foreign-objects '())
@@ -193,7 +193,7 @@
           (case key
             ((:r :w :rw :scratch :redux)
              (push-arg 'starpu-data-access-mode key)
-             (push-arg :pointer value-sym))
+             (push-arg :pointer `(data-handle-handle ,value-sym)))
             (#.cffi:*built-in-foreign-types*
              (push-arg :int +starpu-value+)
              (let ((foreign-object (gensym)))

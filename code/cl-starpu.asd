@@ -8,7 +8,8 @@
   ("alexandria"
    "bordeaux-threads"
    "cffi"
-   "trivial-garbage")
+   "trivial-garbage"
+   "static-vectors")
   :in-order-to ((test-op (test-op "cl-starpu-test-suite")))
   :serial t
   :components
@@ -17,6 +18,7 @@
    (:cffi-grovel-file "grovel")
    (:file "swig-interface")
    (:file "starpu")
-   (:file "data")
+   (:file "data-handle")
+   (:file "vector-handle")
    (:file "codelet")
    (:file "task")))

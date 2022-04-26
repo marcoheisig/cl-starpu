@@ -7,4 +7,6 @@
   :serial t
   :components
   ((:file "packages")
-   (:file "hello-world")))
+   (:file "hello-world")
+   (:file "codelet-arguments")
+   (:file "daxpy")))
