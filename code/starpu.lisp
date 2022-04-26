@@ -1,15 +1,6 @@
 (in-package #:cl-starpu)
 
-(defun starpu-is-initialized ()
-  (not (zerop (%starpu-is-initialized))))
-
-(defun starpu-pause ()
-  (%starpu-pause))
-
-(defun starpu-resume ()
-  (%starpu-resume))
-
-(defun starpu-version ()
+(defun version ()
   (cffi:with-foreign-objects ((major :int)
                               (minor :int)
                               (release :int))
@@ -19,14 +10,26 @@
      (cffi:mem-ref minor :int)
      (cffi:mem-ref release :int))))
 
-(defun starpu-init
+(defun initializedp ()
+  (not (zerop (%starpu-is-initialized))))
+
+(defun pause ()
+  (%starpu-pause))
+
+(defun resume ()
+  (%starpu-resume))
+
+(defun wait-initialized ()
+  (%starpu-wait-initialized))
+
+(defun initialize
     (&key ncpus reserve-ncpus ncuda nopencl nmic nmpi-ms bus-calibrate calibrate
        single-combined-worker
        disable-asynchronous-copy
        disable-asynchronous-cuda-copy
        disable-asynchronous-opencl-copy
        disable-asynchronous-mic-copy)
-  (unless (starpu-is-initialized)
+  (unless (initializedp)
     (cffi:with-foreign-object (conf '(:struct starpu-conf-cstruct))
       (%starpu-conf-init conf)
       ;; Ensure that StarPU doesn't override our signal handlers.
@@ -59,11 +62,5 @@
       ;; Actually initialize.
       (%starpu-init conf))))
 
-(defun starpu-shutdown ()
+(defun shutdown ()
   (%starpu-shutdown))
-
-(defun starpu-display-stats ()
-  (%starpu-display-stats))
-
-(defun starpu-wait-initialized ()
-  (%starpu-wait-initialized))

@@ -4,12 +4,13 @@
   (:nicknames #:starpu)
   (:use #:common-lisp)
   (:export
-   #:starpu-is-initialized
-   #:starpu-init
-   #:starpu-pause
-   #:starpu-resume
-   #:starpu-shutdown
-   #:unpack-arguments
+   #:version
+   #:initialize
+   #:initializedp
+   #:wait-initialized
+   #:pause
+   #:resume
+   #:shutdown
    ;; Codelet
    #:codelet
    #:codeletp
@@ -30,4 +31,8 @@
    #:task-codelet
    #:task-codelet-arguments
    #:task-number-of-buffers
-   #:starpu-task-insert))
+   #:task-insert
+   #:task-wait
+   #:task-wait-for-all
+   #:unpack-arguments
+   ))

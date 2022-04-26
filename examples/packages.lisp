@@ -1,4 +1,4 @@
 (defpackage #:cl-starpu-examples
-  (:use #:common-lisp #:cl-starpu)
+  (:use #:common-lisp)
   (:export
    ))

@@ -239,3 +239,10 @@
        (values
         ,@(loop for (name type) in foreign-objects
                 collect `(cffi:mem-ref ,name ,type))))))
+
+(defun task-wait (task)
+  (declare (task task))
+  (%starpu-task-wait (task-handle task)))
+
+(defun task-wait-for-all ()
+  (%starpu-task-wait-for-all))
