@@ -176,8 +176,7 @@
              (foreign-objects () (reverse reversed-foreign-objects))
              (initforms () (reverse reversed-initforms))
              (push-binding (symbol form)
-               (push symbol reversed-bindings)
-               (push form reversed-bindings))
+               (push `(,symbol ,form) reversed-bindings))
              (push-arg (type arg)
                (push type reversed-args)
                (push arg reversed-args))
@@ -187,8 +186,8 @@
       (loop for rest = args then (cddr rest) until (null rest) do
         (unless (cdr rest)
           (error "Odd number of task insert keywords in ~S." args))
-        (let ((key (first args))
-              (value (second args))
+        (let ((key (first rest))
+              (value (second rest))
               (value-sym (gensym)))
           (push-binding value-sym value)
           (case key
@@ -226,3 +225,17 @@
          (cffi:with-foreign-objects ,(foreign-objects)
            ,@(initforms)
            (%starpu-task-insert (codelet-handle ,codelet) ,@(args) :int 0))))))
+
+(defmacro unpack-arguments (cl-arg &rest foreign-types)
+  (let ((foreign-objects
+          (loop for foreign-type in foreign-types
+                collect `(,(gensym) ,foreign-type))))
+    `(cffi:with-foreign-objects ,foreign-objects
+       (%starpu-codelet-unpack-args
+        ,cl-arg
+        ,@(loop for (name nil) in foreign-objects
+                collect :pointer
+                collect name))
+       (values
+        ,@(loop for (name type) in foreign-objects
+                collect `(cffi:mem-ref ,name ,type))))))

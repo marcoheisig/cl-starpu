@@ -1,7 +1,7 @@
-(in-package #:cl-starpu)
+(in-package #:cl-starpu-examples)
 
-(cffi:defcallback hello-world :void ((buffers :pointer) (cl_arg :pointer))
-  (declare (ignore buffers cl_arg))
+(cffi:defcallback hello-world :void ((buffers :pointer) (cl-arg :pointer))
+  (declare (ignore buffers cl-arg))
   (format t "~&Hello world!~%"))
 
 (defun hello ()
