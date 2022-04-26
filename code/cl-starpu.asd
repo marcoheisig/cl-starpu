@@ -19,5 +19,4 @@
    (:file "starpu")
    (:file "data")
    (:file "codelet")
-   (:file "task")
-   (:file "hello")))
+   (:file "task")))

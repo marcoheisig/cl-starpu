@@ -113,7 +113,7 @@
 (defmethod codeletp ((codelet codelet))
   t)
 
-(defmethod initialize-instance :before ((codelet codelet) &key &allow-other-keys)
+(defmethod initialize-instance ((codelet codelet) &key &allow-other-keys)
   (let ((handle (cffi:foreign-alloc '(:struct starpu-codelet-cstruct))))
     (%starpu-codelet-init handle)
     (setf (codelet-handle codelet) handle)
@@ -122,7 +122,8 @@
      (lambda ()
        (cffi:foreign-string-free
         (cffi:foreign-slot-value handle '(:struct starpu-codelet-cstruct) 'name-slot))
-       (cffi:foreign-free handle)))))
+       (cffi:foreign-free handle)))
+    (call-next-method)))
 
 (defmethod shared-initialize
     ((codelet codelet) slot-names
@@ -130,7 +131,27 @@
        (name (gensym "CODELET-"))
        (max-parallelism nil max-parallelism-supplied-p)
        (number-of-buffers 0)
-       (type :seq))
+       (type :seq)
+       . #.
+       (loop for index below +starpu-maximplementations+
+             collect (intern (format nil "CPU-FUNC-~D" index) *package*)
+             collect (intern (format nil "CUDA-FUNC-~D" index) *package*)
+             collect (intern (format nil "OPENCL-FUNC-~D" index) *package*)))
+  (progn
+    . #.
+    (loop for index below +starpu-maximplementations+
+          collect
+          (let ((arg (intern (format nil "CPU-FUNC-~D" index) *package*)))
+            `(unless (null ,arg)
+               (setf (codelet-cpu-func codelet ,index) ,arg)))
+          collect
+          (let ((arg (intern (format nil "CUDA-FUNC-~D" index) *package*)))
+            `(unless (null ,arg)
+               (setf (codelet-cuda-func codelet ,index) ,arg)))
+          collect
+          (let ((arg (intern (format nil "OPENCL-FUNC-~D" index) *package*)))
+            `(unless (null ,arg)
+               (setf (codelet-opencl-func codelet ,index) ,arg)))))
   (setf (codelet-name codelet)
         name)
   (setf (codelet-type codelet)

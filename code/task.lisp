@@ -152,37 +152,40 @@
 
 (defmacro starpu-task-insert
     (codelet &rest args
-     &key r w rw scratch redux data
-       modes
-       execute-on-worker worker-order
-       value callback callback-arg priority tag tag-only
-       flops sched-ctx cl-args cl-args-nfree
-       handles-sequential-consistency
-       task-deps-array task-color task-synchronous task-end-dep
-     &allow-other-keys)
-  (declare (ignore r w rw scratch redux data modes
-                   execute-on-worker worker-order
-                   callback callback-arg priority tag tag-only
-                   flops sched-ctx cl-args
-                   handles-sequential-consistency
-                   task-deps-array task-color task-synchronous task-end-dep))
+     &key . #1=#.
+       (mapcar
+        (lambda (type)
+          (intern (symbol-name type) *package*))
+        (append
+         '(:r :w :rw :scratch :redux :data :modes
+           :execute-on-worker :worker-order
+           :callback :callback-arg :priority :tag :tag-only
+           :flops :sched-ctx :handles-sequential-consistency
+           :task-deps-array :task-color :task-synchronous :task-end-dep)
+          cffi:*built-in-foreign-types*)))
+  (declare (ignore . #1#))
   (parse-starpu-task-insert-form codelet args))
 
 (defun parse-starpu-task-insert-form (codelet args)
   (let* ((reversed-bindings '())
          (reversed-args '())
-         (reversed-forms '()))
+         (reversed-foreign-objects '())
+         (reversed-initforms '()))
     (labels ((bindings () (reverse reversed-bindings))
              (args () (reverse reversed-args))
-             (forms () (reverse reversed-forms))
+             (foreign-objects () (reverse reversed-foreign-objects))
+             (initforms () (reverse reversed-initforms))
              (push-binding (symbol form)
                (push symbol reversed-bindings)
                (push form reversed-bindings))
              (push-arg (type arg)
                (push type reversed-args)
-               (push arg reversed-args)))
-      (loop for rest = args then (cddr args) until (null rest) do
-        (unless (null (cdr rest))
+               (push arg reversed-args))
+             (push-foreign-object (var type value)
+               (push `(,var ,type) reversed-foreign-objects)
+               (push `(setf (cffi:mem-ref ,var ,type) ,value) reversed-initforms)))
+      (loop for rest = args then (cddr rest) until (null rest) do
+        (unless (cdr rest)
           (error "Odd number of task insert keywords in ~S." args))
         (let ((key (first args))
               (value (second args))
@@ -192,9 +195,12 @@
             ((:r :w :rw :scratch :redux)
              (push-arg 'starpu-data-access-mode key)
              (push-arg :pointer value-sym))
-            ((:args)
-             (push-arg :int +starpu-cl-args+)
-             (push-arg :pointer `(cffi:foreign-array-alloc ,value-sym '(:array :byte))))
+            (#.cffi:*built-in-foreign-types*
+             (push-arg :int +starpu-value+)
+             (let ((foreign-object (gensym)))
+               (push-foreign-object foreign-object key value-sym)
+               (push-arg :pointer foreign-object)
+               (push-arg :size (cffi:foreign-type-size key))))
             ((:callback)
              (push-arg :int +starpu-callback+)
              (push-arg :pointer value-sym))
@@ -217,5 +223,6 @@
             (otherwise
              (error "Unknown task insert key: ~S" key)))))
       `(let ,(bindings)
-         ,@(forms)
-         (%starpu-task-insert (codelet-handle ,codelet) ,@(args) :int 0)))))
+         (cffi:with-foreign-objects ,(foreign-objects)
+           ,@(initforms)
+           (%starpu-task-insert (codelet-handle ,codelet) ,@(args) :int 0))))))
