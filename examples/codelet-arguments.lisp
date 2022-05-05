@@ -5,8 +5,7 @@
 
 (cffi:defcallback codelet-arguments :void ((buffers :pointer) (cl-arg :pointer))
   (declare (ignore buffers))
-  (multiple-value-bind (a b c)
-      (starpu:unpack-arguments cl-arg :int :float :double)
+  (starpu:with-unpacked-arguments cl-arg ((a :int) (b :float) (c :double))
     (format t "~&a: ~S~%b: ~S~%c: ~S~%" a b c)))
 
 (defun codelet-arguments ()

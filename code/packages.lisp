@@ -3,6 +3,7 @@
 (defpackage #:cl-starpu
   (:nicknames #:starpu)
   (:use #:common-lisp)
+  (:shadow #:vector #:vectorp)
   (:export
    #:version
    #:initialize
@@ -11,15 +12,20 @@
    #:pause
    #:resume
    #:shutdown
-   ;; Data Handle
-   #:data-handle
-   #:data-handle-p
-   ;; Vector Handle
-   #:vector-handle
-   #:vector-handle-p
-   #:vector-handle-vector
-   #:make-vector-handle
+   #:with-unpacked-arguments
+   #:with-unpacked-buffers
+   ;; Data
+   #:data
+   #:datap
+   ;; Vector
+   #:make-vector
+   #:vector
+   #:vectorp
+   #:vector-nx
+   #:vector-ptr
+   #:vector-elemsize
    ;; Codelet
+   #:make-codelet
    #:codelet
    #:codeletp
    #:codelet-name
@@ -31,8 +37,11 @@
    #:codelet-opencl-func
    #:codelet-performance-model
    #:codelet-energy-model
-   #:codelet-number-of-buffers
+   #:codelet-nbuffers
+   #:codelet-mode
+   #:codelet-modes
    ;; Task
+   #:make-task
    #:task
    #:taskp
    #:task-name
@@ -42,5 +51,4 @@
    #:task-insert
    #:task-wait
    #:task-wait-for-all
-   #:unpack-arguments
    ))

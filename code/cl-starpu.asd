@@ -14,11 +14,12 @@
   :serial t
   :components
   ((:file "packages")
+   (:file "utilities")
    (:file "swig-lispify")
    (:cffi-grovel-file "grovel")
    (:file "swig-interface")
    (:file "starpu")
-   (:file "data-handle")
-   (:file "vector-handle")
+   (:file "interface")
+   (:file "vector")
    (:file "codelet")
    (:file "task")))

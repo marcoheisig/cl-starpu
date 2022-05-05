@@ -18,9 +18,9 @@
        (function
         (concatenate 'string "%" (lispify c-name)))
        (classname
-        (concatenate 'string (lispify c-name) "-CSTRUCT"))
+        (concatenate 'string "%" (lispify c-name)))
        (slotname
-        (concatenate 'string (lispify c-name) "-SLOT"))
+        (concatenate 'string "%" (lispify c-name)))
        (enumname
         (lispify c-name)))
      (find-package "CL-STARPU"))))

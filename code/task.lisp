@@ -1,150 +1,81 @@
 (in-package #:cl-starpu)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; Generic Functions
-
-(defgeneric taskp (object)
-  (:method ((object t)) nil))
-
-(defgeneric task-handle (task))
-
-(defgeneric task-name (task))
-
-(defgeneric task-codelet (task))
-
-(defgeneric task-codelet-arguments (task))
-
-(defgeneric task-number-of-buffers (task))
-
-(defgeneric task-handles (task))
-
-(defgeneric (setf task-name) (value task))
-
-(defgeneric (setf task-codelet) (value task))
-
-(defgeneric (setf task-codelet-arguments) (task))
-
-(defgeneric (setf task-number-of-buffers) (value task))
-
-(defgeneric (setf task-handles) (value task))
+(defstruct (task
+            (:constructor nil)
+            (:predicate taskp))
+  (handle (alexandria:required-argument :handle)
+   :type cffi:foreign-pointer
+   :read-only t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;; Classes
-
-(defclass task ()
-  ((name
-    :type (or symbol string)
-    :accessor task-name)
-   (handle
-    :type cffi:foreign-pointer
-    :accessor task-handle)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; Slot Access Macros
+;;; Task Handle Access Macros
 
 (defmacro task-handle-slot-ref (handle slot-name)
-  `(cffi:foreign-slot-value ,handle '(:struct starpu-task-cstruct) ,slot-name))
+  `(cffi:foreign-slot-value ,handle '(:struct %starpu-task) ,slot-name))
 
 (defmacro task-handle-name (handle)
-  `(task-handle-slot-ref ,handle 'name-slot))
+  `(task-handle-slot-ref ,handle '%name))
 
 (defmacro task-handle-cl (handle)
-  `(task-handle-slot-ref ,handle 'cl-slot))
+  `(task-handle-slot-ref ,handle '%cl))
 
 (defmacro task-handle-where (handle)
-  `(task-handle-slot-ref ,handle 'where-slot))
+  `(task-handle-slot-ref ,handle '%where))
 
 (defmacro task-handle-nbuffers (handle)
-  `(task-handle-slot-ref ,handle 'nbuffers-slot))
+  `(task-handle-slot-ref ,handle '%nbuffers))
 
 (defmacro task-handle-dyn-handles (handle)
-  `(task-handle-slot-ref ,handle 'dyn-handles-slot))
+  `(task-handle-slot-ref ,handle '%dyn-handles))
 
 (defmacro task-handle-dyn-interfaces (handle)
-  `(task-handle-slot-ref ,handle 'dyn-interfaces-slot))
+  `(task-handle-slot-ref ,handle '%dyn-interfaces))
 
 (defmacro task-handle-dyn-modes (handle)
-  `(task-handle-slot-ref ,handle 'dyn-modes-slot))
+  `(task-handle-slot-ref ,handle '%dyn-modes))
 
 (defmacro task-handle-handles (handle)
-  `(task-handle-slot-ref ,handle 'handles-slot))
+  `(task-handle-slot-ref ,handle '%handles))
 
 (defmacro task-handle-interfaces (handle)
-  `(task-handle-slot-ref ,handle 'interfaces-slot))
+  `(task-handle-slot-ref ,handle '%interfaces))
 
 (defmacro task-handle-modes (handle)
-  `(task-handle-slot-ref ,handle 'modes-slot))
+  `(task-handle-slot-ref ,handle '%modes))
 
 (defmacro task-handle-cl-arg (handle)
-  `(task-handle-slot-ref ,handle 'cl-arg-slot))
+  `(task-handle-slot-ref ,handle '%cl-arg))
 
 (defmacro task-handle-cl-arg-size (handle)
-  `(task-handle-slot-ref ,handle 'cl-arg-size-slot))
+  `(task-handle-slot-ref ,handle '%cl-arg-size))
 
 (defmacro task-handle-callback-func (handle)
-  `(task-handle-slot-ref ,handle 'callback-func-slot))
+  `(task-handle-slot-ref ,handle '%callback-func))
 
 (defmacro task-handle-callback-arg (handle)
-  `(task-handle-slot-ref ,handle 'callback-arg-slot))
+  `(task-handle-slot-ref ,handle '%callback-arg))
 
 (defmacro task-handle-status (handle)
-  `(task-handle-slot-ref ,handle 'status-slot))
+  `(task-handle-slot-ref ,handle '%status))
 
 (defmacro task-handle-type (handle)
-  `(task-handle-slot-ref ,handle 'type-slot))
+  `(task-handle-slot-ref ,handle '%type))
 
 (defmacro task-handle-color (handle)
-  `(task-handle-slot-ref ,handle 'color-slot))
+  `(task-handle-slot-ref ,handle '%color))
 
 (defmacro task-handle-flops (handle)
-  `(task-handle-slot-ref ,handle 'flops-slot))
+  `(task-handle-slot-ref ,handle '%flops))
 
 (defmacro task-handle-predicted (handle)
-  `(task-handle-slot-ref ,handle 'predicted-slot))
+  `(task-handle-slot-ref ,handle '%predicted))
 
 (defmacro task-handle-predicted-transfer (handle)
-  `(task-handle-slot-ref ,handle 'predicted-transfer-slot))
+  `(task-handle-slot-ref ,handle '%predicted-transfer))
 
 (defmacro task-handle-predicted-start (handle)
-  `(task-handle-slot-ref ,handle 'predicted-start-slot))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; Methods
-
-(defmethod taskp ((task task))
-  t)
-
-(defmethod initialize-instance :before ((task task) &key &allow-other-keys)
-  (let ((handle (cffi:foreign-alloc '(:struct starpu-task-cstruct))))
-    (%starpu-task-init handle)
-    (setf (task-handle task) handle)
-    (trivial-garbage:finalize
-     task
-     (lambda ()
-       (cffi:foreign-string-free
-        (cffi:foreign-slot-value handle '(:struct starpu-task-cstruct) 'name-slot))
-       (cffi:foreign-free handle)))))
-
-(defmethod shared-initialize
-    ((task task) slot-names
-     &key (name (gensym "TASK-")))
-  (setf (task-name task)
-        name)
-  (call-next-method))
-
-(defmethod print-object ((task task) stream)
-  (print-unreadable-object (task stream :type t)
-    (format stream "~@<~@{~S ~S~^ ~_~}~:>"
-            :name (task-name task))))
-
-(defmethod (setf task-name) :after (value (task task))
-  (symbol-macrolet ((ptr (task-handle-name (task-handle task))))
-    (cffi:foreign-string-free ptr))
-  (setf ptr (cffi:foreign-string-alloc (string value))))
+  `(task-handle-slot-ref ,handle '%predicted-start))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -193,7 +124,7 @@
           (case key
             ((:r :w :rw :scratch :redux)
              (push-arg 'starpu-data-access-mode key)
-             (push-arg :pointer `(data-handle-handle ,value-sym)))
+             (push-arg :pointer `(interface-handle ,value-sym)))
             (#.cffi:*built-in-foreign-types*
              (push-arg :int +starpu-value+)
              (let ((foreign-object (gensym)))
@@ -225,20 +156,6 @@
          (cffi:with-foreign-objects ,(foreign-objects)
            ,@(initforms)
            (%starpu-task-insert (codelet-handle ,codelet) ,@(args) :int 0))))))
-
-(defmacro unpack-arguments (cl-arg &rest foreign-types)
-  (let ((foreign-objects
-          (loop for foreign-type in foreign-types
-                collect `(,(gensym) ,foreign-type))))
-    `(cffi:with-foreign-objects ,foreign-objects
-       (%starpu-codelet-unpack-args
-        ,cl-arg
-        ,@(loop for (name nil) in foreign-objects
-                collect :pointer
-                collect name))
-       (values
-        ,@(loop for (name type) in foreign-objects
-                collect `(cffi:mem-ref ,name ,type))))))
 
 (defun task-wait (task)
   (declare (task task))

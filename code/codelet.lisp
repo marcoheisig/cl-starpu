@@ -1,148 +1,165 @@
 (in-package #:cl-starpu)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; Generic Functions
+(defstruct (codelet
+            (:constructor nil)
+            (:predicate codeletp))
+  (handle (alexandria:required-argument :handle)
+   :type cffi:foreign-pointer
+   :read-only t))
 
-(defgeneric codeletp (object)
-  (:method ((object t)) nil))
+(defstruct (sequential-codelet
+            (:include codelet)
+            (:constructor %make-sequential-codelet (handle))
+            (:predicate sequential-codelet-p)))
 
-(defgeneric codelet-name (codelet))
+(defstruct (spmd-codelet
+            (:include codelet)
+            (:constructor %make-spmd-codelet (handle))
+            (:predicate spmd-codelet-p)))
 
-(defgeneric codelet-type (codelet))
-
-(defgeneric codelet-max-parallelism (codelet))
-
-(defgeneric codelet-can-execute (codelet))
-
-(defgeneric codelet-cpu-func (codelet index))
-
-(defgeneric codelet-cuda-func (codelet index))
-
-(defgeneric codelet-opencl-func (codelet index))
-
-(defgeneric codelet-performance-model (codelet))
-
-(defgeneric codelet-energy-model (codelet))
-
-(defgeneric codelet-number-of-buffers (codelet))
-
-(defgeneric codelet-mode (codelet index))
-
-(defgeneric codelet-modes (codelet))
-
-(defgeneric (setf codelet-name) (value codelet))
-
-(defgeneric (setf codelet-max-parallelism) (value codelet))
-
-(defgeneric (setf codelet-can-execute) (value codelet))
-
-(defgeneric (setf codelet-cpu-func) (value codelet index))
-
-(defgeneric (setf codelet-cuda-func) (value codelet index))
-
-(defgeneric (setf codelet-opencl-func) (value codelet index))
-
-(defgeneric (setf codelet-performance-model) (value codelet))
-
-(defgeneric (setf codelet-energy-model) (value codelet))
-
-(defgeneric (setf codelet-number-of-buffers) (value codelet))
-
-(defgeneric (setf codelet-mode) (value codelet index))
-
-(defgeneric (setf codelet-modes) (value codelet))
+(defstruct (forkjoin-codelet
+            (:include codelet)
+            (:constructor %make-forkjoin-codelet (handle))
+            (:predicate forkjoin-codelet-p)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;; Classes
-
-(defclass codelet ()
-  ((%name
-    :type (or symbol string)
-    :accessor codelet-name)
-   (%handle
-    :type cffi:foreign-pointer
-    :accessor codelet-handle)
-   (%number-of-buffers
-    :type unsigned-byte
-    :reader codelet-number-of-buffers)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;; Slot Access Macros
+;;; Codelet Handle Access Macros
 
 (defmacro codelet-handle-slot-ref (handle slot-name)
-  `(cffi:foreign-slot-value ,handle '(:struct starpu-codelet-cstruct) ,slot-name))
+  `(cffi:foreign-slot-value ,handle '(:struct %starpu-codelet) ,slot-name))
+
+(defmacro codelet-handle-slot-pointer (handle slot-name)
+  `(cffi:foreign-slot-pointer ,handle '(:struct %starpu-codelet) ,slot-name))
 
 (defmacro codelet-handle-slot-aref (handle slot-name slot-type index)
-  `(cffi:mem-ref
-    (cffi:foreign-slot-pointer ,handle '(:struct starpu-codelet-cstruct) ,slot-name)
+  `(cffi:mem-aref
+    (cffi:foreign-slot-pointer ,handle '(:struct %starpu-codelet) ,slot-name)
     ,slot-type
     ,index))
 
 (defmacro codelet-handle-name (handle)
-  `(codelet-handle-slot-ref ,handle 'name-slot))
+  `(codelet-handle-slot-ref ,handle '%name))
 
 (defmacro codelet-handle-type (handle)
-  `(codelet-handle-slot-ref ,handle 'type-slot))
+  `(codelet-handle-slot-ref ,handle '%type))
 
 (defmacro codelet-handle-max-parallelism (handle)
-  `(codelet-handle-slot-ref ,handle 'max-parallelism-slot))
+  `(codelet-handle-slot-ref ,handle '%max-parallelism))
 
 (defmacro codelet-handle-where (handle)
-  `(codelet-handle-slot-ref ,handle 'where-slot))
+  `(codelet-handle-slot-ref ,handle '%where))
 
 (defmacro codelet-handle-can-execute (handle)
-  `(codelet-handle-slot-ref ,handle 'can-execute-slot))
+  `(codelet-handle-slot-ref ,handle '%can-execute))
 
 (defmacro codelet-handle-performance-model (handle)
-  `(codelet-handle-slot-ref ,handle 'model-slot))
+  `(codelet-handle-slot-ref ,handle '%model))
 
 (defmacro codelet-handle-energy-model (handle)
-  `(codelet-handle-slot-ref ,handle 'energy-model-slot))
+  `(codelet-handle-slot-ref ,handle '%energy-model))
 
 (defmacro codelet-handle-cpu-func (handle index)
-  `(codelet-handle-slot-aref ,handle 'cpu-funcs-slot :pointer ,index))
+  `(codelet-handle-slot-aref ,handle '%cpu-funcs :pointer ,index))
 
 (defmacro codelet-handle-cuda-func (handle index)
-  `(codelet-handle-slot-aref ,handle 'cuda-funcs-slot :pointer ,index))
+  `(codelet-handle-slot-aref ,handle '%cuda-funcs :pointer ,index))
 
 (defmacro codelet-handle-opencl-func (handle index)
-  `(codelet-handle-slot-aref ,handle 'opencl-funcs-slot :pointer ,index))
+  `(codelet-handle-slot-aref ,handle '%opencl-funcs :pointer ,index))
 
 (defmacro codelet-handle-nbuffers (handle)
-  `(codelet-handle-slot-ref ,handle 'nbuffers-slot))
+  `(codelet-handle-slot-ref ,handle '%nbuffers))
 
-(defmacro codelet-handle-mode (handle index)
-  `(codelet-handle-slot-aref ,handle 'modes-slot 'starpu-data-access-mode ,index))
+(defmacro codelet-handle-modes (handle)
+  `(codelet-handle-slot-pointer ,handle '%modes))
 
 (defmacro codelet-handle-dyn-modes (handle)
-  `(codelet-handle-slot-ref ,handle 'dyn-modes-slot))
+  `(codelet-handle-slot-ref ,handle '%dyn-modes))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;; Methods
+;;; Codelet Access Functions
 
-(defmethod codeletp ((codelet codelet))
-  t)
+(defun codelet-name (codelet)
+  (let* ((handle (codelet-handle codelet))
+         (char* (codelet-handle-name handle)))
+    (if (cffi:null-pointer-p char*)
+        nil
+        (read-from-string
+         (cffi:foreign-string-to-lisp char*)))))
 
-(defmethod initialize-instance ((codelet codelet) &key &allow-other-keys)
-  (let ((handle (cffi:foreign-alloc '(:struct starpu-codelet-cstruct))))
-    (%starpu-codelet-init handle)
-    (setf (codelet-handle codelet) handle)
-    (trivial-garbage:finalize
-     codelet
-     (lambda ()
-       (cffi:foreign-string-free
-        (cffi:foreign-slot-value handle '(:struct starpu-codelet-cstruct) 'name-slot))
-       (cffi:foreign-free handle)))
-    (call-next-method)))
+(defun codelet-nbuffers (codelet)
+  (codelet-handle-nbuffers (codelet-handle codelet)))
 
-(defmethod shared-initialize
-    ((codelet codelet) slot-names
-     &key
-       (name (gensym "CODELET-"))
+(defun codelet-max-parallelism (codelet)
+  (codelet-handle-max-parallelism (codelet-handle codelet)))
+
+(defun codelet-can-execute (codelet)
+  (codelet-handle-can-execute (codelet-handle codelet)))
+
+(defun codelet-cpu-func (codelet index)
+  (check-type index (integer 0 (#.+starpu-maximplementations+)))
+  (codelet-handle-cpu-func (codelet-handle codelet) index))
+
+(defun (setf codelet-cpu-func) (value codelet index)
+  (check-type index (integer 0 (#.+starpu-maximplementations+)))
+  (setf (codelet-handle-cpu-func (codelet-handle codelet) index)
+        value))
+
+(defun codelet-cuda-func (codelet index)
+  (check-type index (integer 0 (#.+starpu-maximplementations+)))
+  (codelet-handle-cuda-func (codelet-handle codelet) index))
+
+(defun (setf codelet-cuda-func) (value codelet index)
+  (check-type index (integer 0 (#.+starpu-maximplementations+)))
+  (setf (codelet-handle-cuda-func (codelet-handle codelet) index)
+        value))
+
+(defun codelet-opencl-func (codelet index)
+  (check-type index (integer 0 (#.+starpu-maximplementations+)))
+  (codelet-handle-opencl-func (codelet-handle codelet) index))
+
+(defmethod (setf codelet-opencl-func) (value codelet index)
+  (check-type index (integer 0 (#.+starpu-maximplementations+)))
+  (setf (codelet-handle-opencl-func (codelet-handle codelet) index)
+        value))
+
+(defun codelet-performance-model (codelet)
+  (codelet-handle-performance-model (codelet-handle codelet)))
+
+(defun (setf codelet-performance-model) (value codelet)
+  (setf (codelet-handle-performance-model (codelet-handle codelet))
+        value))
+
+(defun codelet-energy-model (codelet)
+  (codelet-handle-energy-model (codelet-handle codelet)))
+
+(defmethod (setf codelet-energy-model) (value codelet)
+  (setf (codelet-handle-energy-model (codelet-handle codelet))
+        value))
+
+(defun codelet-mode (codelet index)
+  (let ((handle (codelet-handle codelet)))
+    (assert (< index (codelet-handle-nbuffers handle)))
+    (cffi:mem-aref
+     (if (cffi:null-pointer-p (codelet-handle-dyn-modes handle))
+         (codelet-handle-slot-pointer handle '%modes)
+         (codelet-handle-slot-ref handle '%dyn-modes))
+     'starpu-data-access-mode
+     index)))
+
+(defun codelet-modes (codelet)
+  (loop for index below (codelet-nbuffers codelet)
+        collect (codelet-mode codelet index)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; Codelet Creation
+
+(defun make-codelet
+    (&key
+       (name nil)
        (max-parallelism nil max-parallelism-supplied-p)
        (modes '())
        (type :seq)
@@ -151,120 +168,61 @@
              collect (intern (format nil "CPU-FUNC-~D" index) *package*)
              collect (intern (format nil "CUDA-FUNC-~D" index) *package*)
              collect (intern (format nil "OPENCL-FUNC-~D" index) *package*)))
-  (progn
-    . #.
-    (loop for index below +starpu-maximplementations+
-          collect
-          (let ((arg (intern (format nil "CPU-FUNC-~D" index) *package*)))
-            `(unless (null ,arg)
-               (setf (codelet-cpu-func codelet ,index) ,arg)))
-          collect
-          (let ((arg (intern (format nil "CUDA-FUNC-~D" index) *package*)))
-            `(unless (null ,arg)
-               (setf (codelet-cuda-func codelet ,index) ,arg)))
-          collect
-          (let ((arg (intern (format nil "OPENCL-FUNC-~D" index) *package*)))
-            `(unless (null ,arg)
-               (setf (codelet-opencl-func codelet ,index) ,arg)))))
-  (setf (codelet-name codelet)
-        name)
-  (setf (codelet-type codelet)
-        type)
-  (setf (codelet-modes codelet)
-        modes)
-  (when max-parallelism-supplied-p
-    (setf (codelet-max-parallelism codelet)
-          max-parallelism))
-  (call-next-method))
+  (check-type name symbol)
+  (let ((handle (cffi:foreign-alloc '(:struct %starpu-codelet)))
+        (nbuffers (length modes)))
+    (%starpu-codelet-init handle)
+    (setf (codelet-handle-name handle)
+          (if (null name)
+              (cffi:null-pointer)
+              (cffi:foreign-string-alloc (string-from-symbol name))))
+    (setf (codelet-handle-type handle) type)
+    (setf (codelet-handle-nbuffers handle) nbuffers)
+    (when max-parallelism-supplied-p
+      (setf (codelet-handle-max-parallelism handle) max-parallelism))
+    (let ((modes* (if (<= nbuffers +starpu-nmaxbufs+)
+                      (codelet-handle-modes handle)
+                      (setf (codelet-handle-dyn-modes handle)
+                            (cffi:foreign-alloc 'starpu-data-access-mode :count nbuffers)))))
+      (loop for mode in modes
+            for index below nbuffers do
+              (setf (cffi:mem-aref modes* 'starpu-data-access-mode index)
+                    mode)))
+    (progn
+      . #.
+      (loop for index below +starpu-maximplementations+
+            collect
+            (let ((arg (intern (format nil "CPU-FUNC-~D" index) *package*)))
+              `(unless (null ,arg)
+                 (setf (codelet-handle-cpu-func handle ,index) ,arg)))
+            collect
+            (let ((arg (intern (format nil "CUDA-FUNC-~D" index) *package*)))
+              `(unless (null ,arg)
+                 (setf (codelet-handle-cuda-func handle ,index) ,arg)))
+            collect
+            (let ((arg (intern (format nil "OPENCL-FUNC-~D" index) *package*)))
+              `(unless (null ,arg)
+                 (setf (codelet-handle-opencl-func handle ,index) ,arg)))))
+    (trivial-garbage:finalize
+     (funcall
+      (ecase type
+        (:seq #'%make-sequential-codelet)
+        (:spmd #'%make-spmd-codelet)
+        (:forkjoin #'%make-forkjoin-codelet))
+      handle)
+     (lambda ()
+       (cffi:foreign-string-free
+        (cffi:foreign-slot-value handle '(:struct %starpu-codelet) '%name))
+       (cffi:foreign-free (codelet-handle-dyn-modes handle))
+       (cffi:foreign-free handle)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; Miscellaneous
 
 (defmethod print-object ((codelet codelet) stream)
   (print-unreadable-object (codelet stream :type t)
     (format stream "~@<~@{~S ~S~^ ~_~}~:>"
             :name (codelet-name codelet)
-            :type (codelet-type codelet)
-            :modes (codelet-modes codelet))))
-
-(defmethod codelet-type (codelet)
-  (codelet-handle-type (codelet-handle codelet)))
-
-(defmethod codelet-max-parallelism (codelet)
-  (codelet-handle-max-parallelism (codelet-handle codelet)))
-
-(defmethod codelet-can-execute (codelet)
-  (codelet-handle-can-execute (codelet-handle codelet)))
-
-(defmethod codelet-cpu-func (codelet index)
-  (check-type index (integer 0 (#.+starpu-maximplementations+)))
-  (codelet-handle-cpu-func (codelet-handle codelet) index))
-
-(defmethod codelet-cuda-func (codelet index)
-  (check-type index (integer 0 (#.+starpu-maximplementations+)))
-  (codelet-handle-cuda-func (codelet-handle codelet) index))
-
-(defmethod codelet-opencl-func (codelet index)
-  (check-type index (integer 0 (#.+starpu-maximplementations+)))
-  (codelet-handle-opencl-func (codelet-handle codelet) index))
-
-(defmethod codelet-performance-model (codelet)
-  (codelet-handle-performance-model (codelet-handle codelet)))
-
-(defmethod codelet-energy-model (codelet)
-  (codelet-handle-energy-model (codelet-handle codelet)))
-
-(defmethod codelet-mode (codelet index)
-  (assert (< index (codelet-number-of-buffers codelet)))
-  (codelet-handle-mode (codelet-handle codelet) index))
-
-(defmethod codelet-modes (codelet)
-  (let ((handle (codelet-handle codelet)))
-    (loop for index below (codelet-number-of-buffers codelet)
-          collect (codelet-handle-mode handle index))))
-
-(defmethod (setf codelet-name) :after (value codelet)
-  (symbol-macrolet ((ptr (codelet-handle-name (codelet-handle codelet))))
-    (cffi:foreign-string-free ptr))
-  (setf ptr (cffi:foreign-string-alloc (string value))))
-
-(defmethod (setf codelet-type) (value codelet)
-  (setf (codelet-handle-type (codelet-handle codelet))
-        value))
-
-(defmethod (setf codelet-cpu-func) (value codelet index)
-  (check-type index (integer 0 (#.+starpu-maximplementations+)))
-  (setf (codelet-handle-cpu-func (codelet-handle codelet) index)
-        value))
-
-(defmethod (setf codelet-cuda-func) (value codelet index)
-  (check-type index (integer 0 (#.+starpu-maximplementations+)))
-  (setf (codelet-handle-cuda-func (codelet-handle codelet) index)
-        value))
-
-(defmethod (setf codelet-opencl-func) (value codelet index)
-  (check-type index (integer 0 (#.+starpu-maximplementations+)))
-  (setf (codelet-handle-opencl-func (codelet-handle codelet) index)
-        value))
-
-(defmethod (setf codelet-performance-model) (value codelet)
-  (setf (codelet-handle-performance-model (codelet-handle codelet))
-        value))
-
-(defmethod (setf codelet-energy-model) (value codelet)
-  (setf (codelet-handle-energy-model (codelet-handle codelet))
-        value))
-
-(defmethod (setf codelet-mode) (mode codelet index)
-  (assert (< index (codelet-number-of-buffers codelet)))
-  (setf (codelet-handle-mode (codelet-handle codelet) index)
-        mode))
-
-(defmethod (setf codelet-modes) (modes codelet)
-  (let ((n (length modes))
-        (handle (codelet-handle codelet)))
-    (setf (slot-value codelet '%number-of-buffers) n)
-    (if (<= n +starpu-nmaxbufs+)
-        (progn
-          (setf (codelet-handle-nbuffers handle) n)
-          (loop for mode in modes for index below n do
-            (setf (codelet-handle-mode handle index)
-                  mode)))
-        (break "TODO"))))
+            :modes (codelet-modes codelet)
+            :max-parallelism (codelet-max-parallelism codelet))))

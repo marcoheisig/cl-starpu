@@ -32,35 +32,35 @@
        disable-asynchronous-opencl-copy
        disable-asynchronous-mic-copy)
   (unless (initializedp)
-    (cffi:with-foreign-object (conf '(:struct starpu-conf-cstruct))
+    (cffi:with-foreign-object (conf '(:struct %starpu-conf))
       (%starpu-conf-init conf)
       ;; Ensure that StarPU doesn't override our signal handlers.
-      (setf (cffi:foreign-slot-value conf '(:struct starpu-conf-cstruct) 'catch-signals-slot) 0)
+      (setf (cffi:foreign-slot-value conf '(:struct %starpu-conf) '%catch-signals) 0)
       ;; Process all keyword options.
       (macrolet ((process-unsigned-byte-option (variable slot)
                    `(etypecase ,variable
                       (null)            ; Keep the default.
                       (unsigned-byte
-                       (setf (cffi:foreign-slot-value conf '(:struct starpu-conf-cstruct) ',slot)
+                       (setf (cffi:foreign-slot-value conf '(:struct %starpu-conf) ',slot)
                              ,variable))))
                  (process-boolean-option (variable slot)
                    `(progn
                       (check-type ,variable boolean)
-                      (setf (cffi:foreign-slot-value conf '(:struct starpu-conf-cstruct) ',slot)
+                      (setf (cffi:foreign-slot-value conf '(:struct %starpu-conf) ',slot)
                             (if ,variable 1 0)))))
-        (process-unsigned-byte-option ncpus ncpus-slot)
-        (process-unsigned-byte-option reserve-ncpus reserve-ncpus-slot)
-        (process-unsigned-byte-option ncuda ncuda-slot)
-        (process-unsigned-byte-option nopencl nopencl-slot)
-        (process-unsigned-byte-option nmic nmic-slot)
-        (process-unsigned-byte-option nmpi-ms nmpi-ms-slot)
-        (process-boolean-option bus-calibrate bus-calibrate-slot)
-        (process-boolean-option calibrate calibrate-slot)
-        (process-boolean-option single-combined-worker single-combined-worker-slot)
-        (process-boolean-option disable-asynchronous-copy disable-asynchronous-copy-slot)
-        (process-boolean-option disable-asynchronous-cuda-copy disable-asynchronous-cuda-copy-slot)
-        (process-boolean-option disable-asynchronous-opencl-copy disable-asynchronous-opencl-copy-slot)
-        (process-boolean-option disable-asynchronous-mic-copy disable-asynchronous-mic-copy-slot))
+        (process-unsigned-byte-option ncpus %ncpus)
+        (process-unsigned-byte-option reserve-ncpus %reserve-ncpus)
+        (process-unsigned-byte-option ncuda %ncuda)
+        (process-unsigned-byte-option nopencl %nopencl)
+        (process-unsigned-byte-option nmic %nmic)
+        (process-unsigned-byte-option nmpi-ms %nmpi-ms)
+        (process-boolean-option bus-calibrate %bus-calibrate)
+        (process-boolean-option calibrate %calibrate)
+        (process-boolean-option single-combined-worker %single-combined-worker)
+        (process-boolean-option disable-asynchronous-copy %disable-asynchronous-copy)
+        (process-boolean-option disable-asynchronous-cuda-copy %disable-asynchronous-cuda-copy)
+        (process-boolean-option disable-asynchronous-opencl-copy %disable-asynchronous-opencl-copy)
+        (process-boolean-option disable-asynchronous-mic-copy %disable-asynchronous-mic-copy))
       ;; Actually initialize.
       (let ((ret (%starpu-init conf)))
         ;; Handle errors.
