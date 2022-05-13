@@ -16,6 +16,8 @@
 
 (constant (#.(swig-lispify "STARPU_USE_OPENCL" 'constant) "STARPU_USE_OPENCL"))
 
+(constant (#.(swig-lispify "STARPU_USE_CUDA" 'constant) "STARPU_USE_CUDA"))
+
 (constant (#.(swig-lispify "STARPU_OPENMP" 'constant) "STARPU_OPENMP"))
 
 (constant (#.(swig-lispify "STARPU_HAVE_VALGRIND_H" 'constant) "STARPU_HAVE_VALGRIND_H"))
@@ -501,6 +503,7 @@
          (#.(swig-lispify "nmpi_ms" 'slotname) "nmpi_ms" :type :int)
          (#.(swig-lispify "bus_calibrate" 'slotname) "bus_calibrate" :type :int)
          (#.(swig-lispify "calibrate" 'slotname) "calibrate" :type :int)
+         (#.(swig-lispify "sched_policy_name" 'slotname) "sched_policy_name" :type :pointer)
          (#.(swig-lispify "single_combined_worker" 'slotname) "single_combined_worker" :type :int)
          (#.(swig-lispify "disable_asynchronous_copy" 'slotname) "disable_asynchronous_copy" :type :int)
          (#.(swig-lispify "disable_asynchronous_cuda_copy" 'slotname) "disable_asynchronous_copy" :type :int)

@@ -27,11 +27,11 @@
     :name 'daxpy
     :cpu-func-0 (cffi:callback daxpy)
     :modes '(:r :rw))
-   :double a :r x :rw y))
+   :synchronous t
+   :double a :r x :rw y)
+  y)
 
 (defun run-daxpy (&key (length 100) (a 2d0))
   (let ((x (starpu:make-vector length :element-type 'double-float :initial-element 2d0))
         (y (starpu:make-vector length :element-type 'double-float :initial-element 1d0)))
-    (daxpy a x y)
-    (starpu:task-wait-for-all)
-    y))
+    (daxpy a x y)))

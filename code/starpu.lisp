@@ -36,6 +36,9 @@
       (%starpu-conf-init conf)
       ;; Ensure that StarPU doesn't override our signal handlers.
       (setf (cffi:foreign-slot-value conf '(:struct %starpu-conf) '%catch-signals) 0)
+      ;; Set the scheduler. TODO make this configurable
+      (setf (cffi:foreign-slot-value conf '(:struct %starpu-conf) '%sched-policy-name)
+            (cffi:foreign-string-alloc "eager"))
       ;; Process all keyword options.
       (macrolet ((process-unsigned-byte-option (variable slot)
                    `(etypecase ,variable

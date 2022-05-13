@@ -92,7 +92,7 @@
            :execute-on-worker :worker-order
            :callback :callback-arg :priority :tag :tag-only
            :flops :sched-ctx :handles-sequential-consistency
-           :task-deps-array :task-color :task-synchronous :task-end-dep)
+           :deps-array :color :synchronous :end-dep)
           cffi:*built-in-foreign-types*)))
   (declare (ignore . #1#))
   (parse-task-insert codelet args))
@@ -124,7 +124,7 @@
           (case key
             ((:r :w :rw :scratch :redux)
              (push-arg 'starpu-data-access-mode key)
-             (push-arg :pointer `(interface-handle ,value-sym)))
+             (push-arg :pointer `(data-handle ,value-sym)))
             (#.cffi:*built-in-foreign-types*
              (push-arg :int +starpu-value+)
              (let ((foreign-object (gensym)))
@@ -146,9 +146,15 @@
             ((:flops)
              (push-arg :int +starpu-flops+)
              (push-arg :double value-sym))
-            ((:modes :execute-on-worker :worker-order :tag-only :sched-ctx
-                     :handles-sequential-consistency :task-deps-array :task-color
-                     :task-synchronous :task-end-dep)
+            ((:execute-on-worker)
+             (push-arg :int +starpu-execute-on-worker+)
+             (push-arg :int value-sym))
+            ((:synchronous)
+             (push-arg :int +starpu-task-synchronous+)
+             (push-arg :int `(if ,value-sym 1 0)))
+            ((:modes :worker-order :tag-only :sched-ctx
+                     :handles-sequential-consistency :deps-array :color
+                     :end-dep)
              (break "TODO"))
             (otherwise
              (error "Unknown task insert key: ~S" key)))))

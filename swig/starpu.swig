@@ -2,6 +2,16 @@
 
 %feature("intern_function", "1");
 
+%inline %{typedef signed char int8_t; %}
+%inline %{typedef short int int16_t; %}
+%inline %{typedef int int32_t; %}
+%inline %{typedef long int int64_t; %}
+%inline %{typedef unsigned char uint8_t; %}
+%inline %{typedef unsigned short int uint16_t; %}
+%inline %{typedef unsigned int uint32_t; %}
+%inline %{typedef unsigned long int uint64_t; %}
+%inline %{typedef long unsigned int size_t; %}
+
 %include "starpu/1.3/starpu_config.h"
 %include "starpu/1.3/starpu_util.h"
 %include "cl-starpu-tweaks.h"

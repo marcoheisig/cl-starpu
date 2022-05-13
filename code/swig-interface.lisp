@@ -208,7 +208,7 @@
 
 (cffi:defcfun ("starpu_data_set_wt_mask" #.(swig-lispify "starpu_data_set_wt_mask" 'function)) :void
   (handle :pointer)
-  (wt_mask :pointer))
+  (wt_mask :unsigned-int))
 
 (cffi:defcfun ("starpu_data_set_sequential_consistency_flag" #.(swig-lispify "starpu_data_set_sequential_consistency_flag" 'function)) :void
   (handle :pointer)
@@ -278,12 +278,12 @@
 (cffi:defcfun ("starpu_execute_on_each_worker" #.(swig-lispify "starpu_execute_on_each_worker" 'function)) :void
   (func :pointer)
   (arg :pointer)
-  (where :pointer))
+  (where :unsigned-int))
 
 (cffi:defcfun ("starpu_execute_on_each_worker_ex" #.(swig-lispify "starpu_execute_on_each_worker_ex" 'function)) :void
   (func :pointer)
   (arg :pointer)
-  (where :pointer)
+  (where :unsigned-int)
   (name :string))
 
 (cffi:defcfun ("starpu_execute_on_specific_workers" #.(swig-lispify "starpu_execute_on_specific_workers" 'function)) :void
@@ -320,12 +320,12 @@
 (cffi:defcfun ("starpu_disk_close" #.(swig-lispify "starpu_disk_close" 'function)) :void
   (node :unsigned-int)
   (obj :pointer)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcfun ("starpu_disk_open" #.(swig-lispify "starpu_disk_open" 'function)) :pointer
   (node :unsigned-int)
   (pos :pointer)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcfun ("starpu_disk_register" #.(swig-lispify "starpu_disk_register" 'function)) :int
   (func :pointer)
@@ -376,12 +376,12 @@
 (cffi:defcfun ("starpu_data_unpack" #.(swig-lispify "starpu_data_unpack" 'function)) :int
   (handle :pointer)
   (ptr :pointer)
-  (count :pointer))
+  (count :unsigned-long))
 
-(cffi:defcfun ("starpu_data_get_size" #.(swig-lispify "starpu_data_get_size" 'function)) :pointer
+(cffi:defcfun ("starpu_data_get_size" #.(swig-lispify "starpu_data_get_size" 'function)) :unsigned-long
   (handle :pointer))
 
-(cffi:defcfun ("starpu_data_get_alloc_size" #.(swig-lispify "starpu_data_get_alloc_size" 'function)) :pointer
+(cffi:defcfun ("starpu_data_get_alloc_size" #.(swig-lispify "starpu_data_get_alloc_size" 'function)) :unsigned-long
   (handle :pointer))
 
 (cffi:defcfun ("starpu_data_lookup" #.(swig-lispify "starpu_data_lookup" 'function)) :pointer
@@ -394,12 +394,12 @@
 
 (cffi:defcfun ("starpu_interface_copy" #.(swig-lispify "starpu_interface_copy" 'function)) :int
   (src :pointer)
-  (src_offset :pointer)
+  (src_offset :unsigned-long)
   (src_node :unsigned-int)
   (dst :pointer)
-  (dst_offset :pointer)
+  (dst_offset :unsigned-long)
   (dst_node :unsigned-int)
-  (size :pointer)
+  (size :unsigned-long)
   (async_data :pointer))
 
 (cffi:defcfun ("starpu_interface_start_driver_copy_async" #.(swig-lispify "starpu_interface_start_driver_copy_async" 'function)) :void
@@ -415,27 +415,27 @@
 (cffi:defcfun ("starpu_interface_data_copy" #.(swig-lispify "starpu_interface_data_copy" 'function)) :void
   (src_node :unsigned-int)
   (dst_node :unsigned-int)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcfun ("starpu_malloc_on_node_flags" #.(swig-lispify "starpu_malloc_on_node_flags" 'function)) :pointer
   (dst_node :unsigned-int)
-  (size :pointer)
+  (size :unsigned-long)
   (flags :int))
 
 (cffi:defcfun ("starpu_malloc_on_node" #.(swig-lispify "starpu_malloc_on_node" 'function)) :pointer
   (dst_node :unsigned-int)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcfun ("starpu_free_on_node_flags" #.(swig-lispify "starpu_free_on_node_flags" 'function)) :void
   (dst_node :unsigned-int)
   (addr :pointer)
-  (size :pointer)
+  (size :unsigned-long)
   (flags :int))
 
 (cffi:defcfun ("starpu_free_on_node" #.(swig-lispify "starpu_free_on_node" 'function)) :void
   (dst_node :unsigned-int)
   (addr :pointer)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcfun ("starpu_malloc_on_node_set_default_flags" #.(swig-lispify "starpu_malloc_on_node_set_default_flags" 'function)) :void
   (node :unsigned-int)
@@ -448,45 +448,45 @@
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (ld :uint32)
-  (nx :uint32)
-  (ny :uint32)
-  (elemsize :size))
+  (ld :unsigned-int)
+  (nx :unsigned-int)
+  (ny :unsigned-int)
+  (elemsize :unsigned-long))
 
 (cffi:defcfun ("starpu_matrix_data_register_allocsize" #.(swig-lispify "starpu_matrix_data_register_allocsize" 'function)) :void
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (ld :uint32)
-  (nx :uint32)
-  (ny :uint32)
-  (elemsize :size)
-  (allocsize :size))
+  (ld :unsigned-int)
+  (nx :unsigned-int)
+  (ny :unsigned-int)
+  (elemsize :unsigned-long)
+  (allocsize :unsigned-long))
 
 (cffi:defcfun ("starpu_matrix_ptr_register" #.(swig-lispify "starpu_matrix_ptr_register" 'function)) :void
   (handle :pointer)
   (node :unsigned-int)
   (ptr :pointer)
   (dev_handle :pointer)
-  (offset :size)
-  (ld :uint32))
+  (offset :unsigned-long)
+  (ld :unsigned-int))
 
-(cffi:defcfun ("starpu_matrix_get_nx" #.(swig-lispify "starpu_matrix_get_nx" 'function)) :pointer
+(cffi:defcfun ("starpu_matrix_get_nx" #.(swig-lispify "starpu_matrix_get_nx" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_matrix_get_ny" #.(swig-lispify "starpu_matrix_get_ny" 'function)) :pointer
+(cffi:defcfun ("starpu_matrix_get_ny" #.(swig-lispify "starpu_matrix_get_ny" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_matrix_get_local_ld" #.(swig-lispify "starpu_matrix_get_local_ld" 'function)) :pointer
+(cffi:defcfun ("starpu_matrix_get_local_ld" #.(swig-lispify "starpu_matrix_get_local_ld" 'function)) :unsigned-int
   (handle :pointer))
 
 (cffi:defcfun ("starpu_matrix_get_local_ptr" #.(swig-lispify "starpu_matrix_get_local_ptr" 'function)) :pointer
   (handle :pointer))
 
-(cffi:defcfun ("starpu_matrix_get_elemsize" #.(swig-lispify "starpu_matrix_get_elemsize" 'function)) :pointer
+(cffi:defcfun ("starpu_matrix_get_elemsize" #.(swig-lispify "starpu_matrix_get_elemsize" 'function)) :unsigned-long
   (handle :pointer))
 
-(cffi:defcfun ("starpu_matrix_get_allocsize" #.(swig-lispify "starpu_matrix_get_allocsize" 'function)) :pointer
+(cffi:defcfun ("starpu_matrix_get_allocsize" #.(swig-lispify "starpu_matrix_get_allocsize" 'function)) :unsigned-long
   (handle :pointer))
 
 (cffi:defcvar ("starpu_interface_coo_ops" #.(swig-lispify "starpu_interface_coo_ops" 'variable))
@@ -495,13 +495,13 @@
 (cffi:defcfun ("starpu_coo_data_register" #.(swig-lispify "starpu_coo_data_register" 'function)) :void
   (handleptr :pointer)
   (home_node :int)
-  (nx :pointer)
-  (ny :pointer)
-  (n_values :pointer)
+  (nx :unsigned-int)
+  (ny :unsigned-int)
+  (n_values :unsigned-int)
   (columns :pointer)
   (rows :pointer)
   (values :pointer)
-  (elemsize :pointer))
+  (elemsize :unsigned-long))
 
 (cffi:defcvar ("starpu_interface_block_ops" #.(swig-lispify "starpu_interface_block_ops" 'variable))
  #.(swig-lispify "starpu_data_interface_ops" 'classname))
@@ -510,41 +510,41 @@
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (ldy :uint32)
-  (ldz :uint32)
-  (nx :uint32)
-  (ny :uint32)
-  (nz :uint32)
-  (elemsize :size))
+  (ldy :unsigned-int)
+  (ldz :unsigned-int)
+  (nx :unsigned-int)
+  (ny :unsigned-int)
+  (nz :unsigned-int)
+  (elemsize :unsigned-long))
 
 (cffi:defcfun ("starpu_block_ptr_register" #.(swig-lispify "starpu_block_ptr_register" 'function)) :void
   (handle :pointer)
   (node :unsigned-int)
   (ptr :pointer)
   (dev_handle :pointer)
-  (offset :pointer)
-  (ldy :uint32)
-  (ldz :uint32))
+  (offset :unsigned-long)
+  (ldy :unsigned-int)
+  (ldz :unsigned-int))
 
-(cffi:defcfun ("starpu_block_get_nx" #.(swig-lispify "starpu_block_get_nx" 'function)) :pointer
+(cffi:defcfun ("starpu_block_get_nx" #.(swig-lispify "starpu_block_get_nx" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_block_get_ny" #.(swig-lispify "starpu_block_get_ny" 'function)) :pointer
+(cffi:defcfun ("starpu_block_get_ny" #.(swig-lispify "starpu_block_get_ny" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_block_get_nz" #.(swig-lispify "starpu_block_get_nz" 'function)) :pointer
+(cffi:defcfun ("starpu_block_get_nz" #.(swig-lispify "starpu_block_get_nz" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_block_get_local_ldy" #.(swig-lispify "starpu_block_get_local_ldy" 'function)) :pointer
+(cffi:defcfun ("starpu_block_get_local_ldy" #.(swig-lispify "starpu_block_get_local_ldy" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_block_get_local_ldz" #.(swig-lispify "starpu_block_get_local_ldz" 'function)) :pointer
+(cffi:defcfun ("starpu_block_get_local_ldz" #.(swig-lispify "starpu_block_get_local_ldz" 'function)) :unsigned-int
   (handle :pointer))
 
 (cffi:defcfun ("starpu_block_get_local_ptr" #.(swig-lispify "starpu_block_get_local_ptr" 'function)) :pointer
   (handle :pointer))
 
-(cffi:defcfun ("starpu_block_get_elemsize" #.(swig-lispify "starpu_block_get_elemsize" 'function)) :pointer
+(cffi:defcfun ("starpu_block_get_elemsize" #.(swig-lispify "starpu_block_get_elemsize" 'function)) :unsigned-long
   (handle :pointer))
 
 (cffi:defcvar ("starpu_interface_vector_ops" #.(swig-lispify "starpu_interface_vector_ops" 'variable))
@@ -554,31 +554,31 @@
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (nx :uint32)
-  (elemsize :size))
+  (nx :unsigned-int)
+  (elemsize :unsigned-long))
 
 (cffi:defcfun ("starpu_vector_data_register_allocsize" #.(swig-lispify "starpu_vector_data_register_allocsize" 'function)) :void
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (nx :uint32)
-  (elemsize :size)
-  (allocsize :size))
+  (nx :unsigned-int)
+  (elemsize :unsigned-long)
+  (allocsize :unsigned-long))
 
 (cffi:defcfun ("starpu_vector_ptr_register" #.(swig-lispify "starpu_vector_ptr_register" 'function)) :void
   (handle :pointer)
   (node :unsigned-int)
   (ptr :pointer)
   (dev_handle :pointer)
-  (offset :size))
+  (offset :unsigned-long))
 
-(cffi:defcfun ("starpu_vector_get_nx" #.(swig-lispify "starpu_vector_get_nx" 'function)) :uint32
+(cffi:defcfun ("starpu_vector_get_nx" #.(swig-lispify "starpu_vector_get_nx" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_vector_get_elemsize" #.(swig-lispify "starpu_vector_get_elemsize" 'function)) :size
+(cffi:defcfun ("starpu_vector_get_elemsize" #.(swig-lispify "starpu_vector_get_elemsize" 'function)) :unsigned-long
   (handle :pointer))
 
-(cffi:defcfun ("starpu_vector_get_allocsize" #.(swig-lispify "starpu_vector_get_allocsize" 'function)) :size
+(cffi:defcfun ("starpu_vector_get_allocsize" #.(swig-lispify "starpu_vector_get_allocsize" 'function)) :unsigned-long
   (handle :pointer))
 
 (cffi:defcfun ("starpu_vector_get_local_ptr" #.(swig-lispify "starpu_vector_get_local_ptr" 'function)) :pointer
@@ -591,16 +591,16 @@
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcfun ("starpu_variable_ptr_register" #.(swig-lispify "starpu_variable_ptr_register" 'function)) :void
   (handle :pointer)
   (node :unsigned-int)
   (ptr :pointer)
   (dev_handle :pointer)
-  (offset :pointer))
+  (offset :unsigned-long))
 
-(cffi:defcfun ("starpu_variable_get_elemsize" #.(swig-lispify "starpu_variable_get_elemsize" 'function)) :pointer
+(cffi:defcfun ("starpu_variable_get_elemsize" #.(swig-lispify "starpu_variable_get_elemsize" 'function)) :unsigned-long
   (handle :pointer))
 
 (cffi:defcfun ("starpu_variable_get_local_ptr" #.(swig-lispify "starpu_variable_get_local_ptr" 'function)) :pointer
@@ -618,21 +618,21 @@
 (cffi:defcfun ("starpu_csr_data_register" #.(swig-lispify "starpu_csr_data_register" 'function)) :void
   (handle :pointer)
   (home_node :int)
-  (nnz :pointer)
-  (nrow :pointer)
+  (nnz :unsigned-int)
+  (nrow :unsigned-int)
   (nzval :pointer)
   (colind :pointer)
   (rowptr :pointer)
-  (firstentry :pointer)
-  (elemsize :pointer))
+  (firstentry :unsigned-int)
+  (elemsize :unsigned-long))
 
-(cffi:defcfun ("starpu_csr_get_nnz" #.(swig-lispify "starpu_csr_get_nnz" 'function)) :pointer
+(cffi:defcfun ("starpu_csr_get_nnz" #.(swig-lispify "starpu_csr_get_nnz" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_csr_get_nrow" #.(swig-lispify "starpu_csr_get_nrow" 'function)) :pointer
+(cffi:defcfun ("starpu_csr_get_nrow" #.(swig-lispify "starpu_csr_get_nrow" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_csr_get_firstentry" #.(swig-lispify "starpu_csr_get_firstentry" 'function)) :pointer
+(cffi:defcfun ("starpu_csr_get_firstentry" #.(swig-lispify "starpu_csr_get_firstentry" 'function)) :unsigned-int
   (handle :pointer))
 
 (cffi:defcfun ("starpu_csr_get_local_nzval" #.(swig-lispify "starpu_csr_get_local_nzval" 'function)) :pointer
@@ -644,7 +644,7 @@
 (cffi:defcfun ("starpu_csr_get_local_rowptr" #.(swig-lispify "starpu_csr_get_local_rowptr" 'function)) :pointer
   (handle :pointer))
 
-(cffi:defcfun ("starpu_csr_get_elemsize" #.(swig-lispify "starpu_csr_get_elemsize" 'function)) :pointer
+(cffi:defcfun ("starpu_csr_get_elemsize" #.(swig-lispify "starpu_csr_get_elemsize" 'function)) :unsigned-long
   (handle :pointer))
 
 (cffi:defcvar ("starpu_interface_bcsr_ops" #.(swig-lispify "starpu_interface_bcsr_ops" 'variable))
@@ -653,23 +653,23 @@
 (cffi:defcfun ("starpu_bcsr_data_register" #.(swig-lispify "starpu_bcsr_data_register" 'function)) :void
   (handle :pointer)
   (home_node :int)
-  (nnz :pointer)
-  (nrow :pointer)
+  (nnz :unsigned-int)
+  (nrow :unsigned-int)
   (nzval :pointer)
   (colind :pointer)
   (rowptr :pointer)
-  (firstentry :pointer)
-  (r :pointer)
-  (c :pointer)
-  (elemsize :pointer))
+  (firstentry :unsigned-int)
+  (r :unsigned-int)
+  (c :unsigned-int)
+  (elemsize :unsigned-long))
 
-(cffi:defcfun ("starpu_bcsr_get_nnz" #.(swig-lispify "starpu_bcsr_get_nnz" 'function)) :pointer
+(cffi:defcfun ("starpu_bcsr_get_nnz" #.(swig-lispify "starpu_bcsr_get_nnz" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_bcsr_get_nrow" #.(swig-lispify "starpu_bcsr_get_nrow" 'function)) :pointer
+(cffi:defcfun ("starpu_bcsr_get_nrow" #.(swig-lispify "starpu_bcsr_get_nrow" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_bcsr_get_firstentry" #.(swig-lispify "starpu_bcsr_get_firstentry" 'function)) :pointer
+(cffi:defcfun ("starpu_bcsr_get_firstentry" #.(swig-lispify "starpu_bcsr_get_firstentry" 'function)) :unsigned-int
   (handle :pointer))
 
 (cffi:defcfun ("starpu_bcsr_get_local_nzval" #.(swig-lispify "starpu_bcsr_get_local_nzval" 'function)) :pointer
@@ -681,20 +681,20 @@
 (cffi:defcfun ("starpu_bcsr_get_local_rowptr" #.(swig-lispify "starpu_bcsr_get_local_rowptr" 'function)) :pointer
   (handle :pointer))
 
-(cffi:defcfun ("starpu_bcsr_get_r" #.(swig-lispify "starpu_bcsr_get_r" 'function)) :pointer
+(cffi:defcfun ("starpu_bcsr_get_r" #.(swig-lispify "starpu_bcsr_get_r" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_bcsr_get_c" #.(swig-lispify "starpu_bcsr_get_c" 'function)) :pointer
+(cffi:defcfun ("starpu_bcsr_get_c" #.(swig-lispify "starpu_bcsr_get_c" 'function)) :unsigned-int
   (handle :pointer))
 
-(cffi:defcfun ("starpu_bcsr_get_elemsize" #.(swig-lispify "starpu_bcsr_get_elemsize" 'function)) :pointer
+(cffi:defcfun ("starpu_bcsr_get_elemsize" #.(swig-lispify "starpu_bcsr_get_elemsize" 'function)) :unsigned-long
   (handle :pointer))
 
 (cffi:defcfun ("starpu_multiformat_data_register" #.(swig-lispify "starpu_multiformat_data_register" 'function)) :void
   (handle :pointer)
   (home_node :int)
   (ptr :pointer)
-  (nobjects :pointer)
+  (nobjects :unsigned-int)
   (format_ops :pointer))
 
 (cffi:defcfun ("starpu_data_partition" #.(swig-lispify "starpu_data_partition" 'function)) :void
@@ -924,30 +924,30 @@
 (cffi:defcfun ("starpu_filter_nparts_compute_chunk_size_and_offset" #.(swig-lispify "starpu_filter_nparts_compute_chunk_size_and_offset" 'function)) :void
   (n :unsigned-int)
   (nparts :unsigned-int)
-  (elemsize :pointer)
+  (elemsize :unsigned-long)
   (id :unsigned-int)
   (ld :unsigned-int)
   (chunk_size :pointer)
   (offset :pointer))
 
 (cffi:defcfun ("starpu_malloc_set_align" #.(swig-lispify "starpu_malloc_set_align" 'function)) :void
-  (align :pointer))
+  (align :unsigned-long))
 
 (cffi:defcfun ("starpu_malloc" #.(swig-lispify "starpu_malloc" 'function)) :int
   (A :pointer)
-  (dim :pointer))
+  (dim :unsigned-long))
 
 (cffi:defcfun ("starpu_free" #.(swig-lispify "starpu_free" 'function)) :int
   (A :pointer))
 
 (cffi:defcfun ("starpu_malloc_flags" #.(swig-lispify "starpu_malloc_flags" 'function)) :int
   (A :pointer)
-  (dim :pointer)
+  (dim :unsigned-long)
   (flags :int))
 
 (cffi:defcfun ("starpu_free_flags" #.(swig-lispify "starpu_free_flags" 'function)) :int
   (A :pointer)
-  (dim :pointer)
+  (dim :unsigned-long)
   (flags :int))
 
 (cffi:defcfun ("starpu_malloc_set_hooks" #.(swig-lispify "starpu_malloc_set_hooks" 'function)) :void
@@ -956,11 +956,11 @@
 
 (cffi:defcfun ("starpu_memory_pin" #.(swig-lispify "starpu_memory_pin" 'function)) :int
   (addr :pointer)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcfun ("starpu_memory_unpin" #.(swig-lispify "starpu_memory_unpin" 'function)) :int
   (addr :pointer)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcfun ("starpu_memory_get_total" #.(swig-lispify "starpu_memory_get_total" 'function)) :pointer
   (node :unsigned-int))
@@ -974,16 +974,16 @@
 
 (cffi:defcfun ("starpu_memory_allocate" #.(swig-lispify "starpu_memory_allocate" 'function)) :int
   (node :unsigned-int)
-  (size :pointer)
+  (size :unsigned-long)
   (flags :int))
 
 (cffi:defcfun ("starpu_memory_deallocate" #.(swig-lispify "starpu_memory_deallocate" 'function)) :void
   (node :unsigned-int)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcfun ("starpu_memory_wait_available" #.(swig-lispify "starpu_memory_wait_available" 'function)) :void
   (node :unsigned-int)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcfun ("starpu_sleep" #.(swig-lispify "starpu_sleep" 'function)) :void
   (nb_sec :float))
@@ -1057,33 +1057,33 @@
   (t_arg0 :pointer))
 
 (cffi:defcfun ("starpu_tag_declare_deps" #.(swig-lispify "starpu_tag_declare_deps" 'function)) :void
-  (id :pointer)
+  (id :unsigned-long)
   (ndeps :unsigned-int)
   &rest)
 
 (cffi:defcfun ("starpu_tag_declare_deps_array" #.(swig-lispify "starpu_tag_declare_deps_array" 'function)) :void
-  (id :pointer)
+  (id :unsigned-long)
   (ndeps :unsigned-int)
   (array :pointer))
 
 (cffi:defcfun ("starpu_tag_wait" #.(swig-lispify "starpu_tag_wait" 'function)) :int
-  (id :pointer))
+  (id :unsigned-long))
 
 (cffi:defcfun ("starpu_tag_wait_array" #.(swig-lispify "starpu_tag_wait_array" 'function)) :int
   (ntags :unsigned-int)
   (id :pointer))
 
 (cffi:defcfun ("starpu_tag_restart" #.(swig-lispify "starpu_tag_restart" 'function)) :void
-  (id :pointer))
+  (id :unsigned-long))
 
 (cffi:defcfun ("starpu_tag_remove" #.(swig-lispify "starpu_tag_remove" 'function)) :void
-  (id :pointer))
+  (id :unsigned-long))
 
 (cffi:defcfun ("starpu_tag_notify_from_apps" #.(swig-lispify "starpu_tag_notify_from_apps" 'function)) :void
-  (id :pointer))
+  (id :unsigned-long))
 
 (cffi:defcfun ("starpu_tag_get_task" #.(swig-lispify "starpu_tag_get_task" 'function)) :pointer
-  (id :pointer))
+  (id :unsigned-long))
 
 (cffi:defcfun ("starpu_task_init" #.(swig-lispify "starpu_task_init" 'function)) :void
   (task :pointer))
@@ -1166,7 +1166,7 @@
   (task :pointer))
 
 (cffi:defcfun ("starpu_create_sync_task" #.(swig-lispify "starpu_create_sync_task" 'function)) :void
-  (sync_tag :pointer)
+  (sync_tag :unsigned-long)
   (ndeps :unsigned-int)
   (deps :pointer)
   (callback :pointer)
@@ -1231,7 +1231,7 @@
 (cffi:defcfun ("starpu_worker_get_name" #.(swig-lispify "starpu_worker_get_name" 'function)) :void
   (id :int)
   (dst :string)
-  (maxlen :pointer))
+  (maxlen :unsigned-long))
 
 (cffi:defcfun ("starpu_worker_display_names" #.(swig-lispify "starpu_worker_display_names" 'function)) :void
   (output :pointer)
@@ -1294,7 +1294,7 @@
 (cffi:defcfun ("starpu_memory_node_get_name" #.(swig-lispify "starpu_memory_node_get_name" 'function)) :int
   (node :unsigned-int)
   (name :string)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcfun ("starpu_memory_nodes_get_numa_count" #.(swig-lispify "starpu_memory_nodes_get_numa_count" 'function)) :int)
 
@@ -1378,7 +1378,7 @@
 (cffi:defcfun ("starpu_perfmodel_get_model_path" #.(swig-lispify "starpu_perfmodel_get_model_path" 'function)) :void
   (symbol :string)
   (path :string)
-  (maxlen :pointer))
+  (maxlen :unsigned-long))
 
 (cffi:defcfun ("starpu_perfmodel_dump_xml" #.(swig-lispify "starpu_perfmodel_dump_xml" 'function)) :void
   (output :pointer)
@@ -1429,7 +1429,7 @@
   (model :pointer)
   (arch :pointer)
   (path :string)
-  (maxlen :pointer)
+  (maxlen :unsigned-long)
   (nimpl :unsigned-int))
 
 (cffi:defcfun ("starpu_perfmodel_get_archtype_name" #.(swig-lispify "starpu_perfmodel_get_archtype_name" 'function)) :string
@@ -1438,13 +1438,13 @@
 (cffi:defcfun ("starpu_perfmodel_get_arch_name" #.(swig-lispify "starpu_perfmodel_get_arch_name" 'function)) :void
   (arch :pointer)
   (archname :string)
-  (maxlen :pointer)
+  (maxlen :unsigned-long)
   (nimpl :unsigned-int))
 
 (cffi:defcfun ("starpu_perfmodel_history_based_expected_perf" #.(swig-lispify "starpu_perfmodel_history_based_expected_perf" 'function)) :double
   (model :pointer)
   (arch :pointer)
-  (footprint :pointer))
+  (footprint :unsigned-int))
 
 (cffi:defcfun ("starpu_perfmodel_initialize" #.(swig-lispify "starpu_perfmodel_initialize" 'function)) :void)
 
@@ -1468,7 +1468,7 @@
 
 (cffi:defcfun ("starpu_perfmodel_print_estimations" #.(swig-lispify "starpu_perfmodel_print_estimations" 'function)) :int
   (model :pointer)
-  (footprint :pointer)
+  (footprint :unsigned-int)
   (output :pointer))
 
 (cffi:defcfun ("starpu_perfmodel_list_combs" #.(swig-lispify "starpu_perfmodel_list_combs" 'function)) :int
@@ -1506,7 +1506,7 @@
 (cffi:defcfun ("starpu_transfer_predict" #.(swig-lispify "starpu_transfer_predict" 'function)) :double
   (src_node :unsigned-int)
   (dst_node :unsigned-int)
-  (size :pointer))
+  (size :unsigned-long))
 
 (cffi:defcvar ("starpu_perfmodel_nop" #.(swig-lispify "starpu_perfmodel_nop" 'variable))
  #.(swig-lispify "starpu_perfmodel" 'classname))
@@ -1617,7 +1617,7 @@
 (cffi:defcfun ("starpu_codelet_pack_arg" #.(swig-lispify "starpu_codelet_pack_arg" 'function)) :void
   (state :pointer)
   (ptr :pointer)
-  (ptr_size :pointer))
+  (ptr_size :unsigned-long))
 
 (cffi:defcfun ("starpu_codelet_pack_arg_fini" #.(swig-lispify "starpu_codelet_pack_arg_fini" 'function)) :void
   (state :pointer)
@@ -1631,7 +1631,7 @@
 (cffi:defcfun ("starpu_codelet_unpack_args_and_copyleft" #.(swig-lispify "starpu_codelet_unpack_args_and_copyleft" 'function)) :void
   (cl_arg :pointer)
   (buffer :pointer)
-  (buffer_size :pointer)
+  (buffer_size :unsigned-long)
   &rest)
 
 (cffi:defcfun ("starpu_sched_get_predefined_policies" #.(swig-lispify "starpu_sched_get_predefined_policies" 'function)) :pointer)
@@ -1715,13 +1715,13 @@
   (task :pointer)
   (worker :unsigned-int))
 
-(cffi:defcfun ("starpu_task_footprint" #.(swig-lispify "starpu_task_footprint" 'function)) :pointer
+(cffi:defcfun ("starpu_task_footprint" #.(swig-lispify "starpu_task_footprint" 'function)) :unsigned-int
   (model :pointer)
   (task :pointer)
   (arch :pointer)
   (nimpl :unsigned-int))
 
-(cffi:defcfun ("starpu_task_data_footprint" #.(swig-lispify "starpu_task_data_footprint" 'function)) :pointer
+(cffi:defcfun ("starpu_task_data_footprint" #.(swig-lispify "starpu_task_data_footprint" 'function)) :unsigned-int
   (task :pointer))
 
 (cffi:defcfun ("starpu_task_expected_length" #.(swig-lispify "starpu_task_expected_length" 'function)) :double
@@ -2029,6 +2029,35 @@
 (cffi:defcfun ("starpu_idle_hook_deregister" #.(swig-lispify "starpu_idle_hook_deregister" 'function)) :void
   (hook_id :int))
 
+(cffi:defcfun ("starpu_cublas_report_error" #.(swig-lispify "starpu_cublas_report_error" 'function)) :void
+  (func :string)
+  (file :string)
+  (line :int)
+  (status :int))
+
+(cffi:defcfun ("starpu_cuda_report_error" #.(swig-lispify "starpu_cuda_report_error" 'function)) :void
+  (func :string)
+  (file :string)
+  (line :int)
+  (status :pointer))
+
+(cffi:defcfun ("starpu_cuda_get_local_stream" #.(swig-lispify "starpu_cuda_get_local_stream" 'function)) :pointer)
+
+(cffi:defcfun ("starpu_cuda_get_device_properties" #.(swig-lispify "starpu_cuda_get_device_properties" 'function)) :pointer
+  (workerid :unsigned-int))
+
+(cffi:defcfun ("starpu_cuda_copy_async_sync" #.(swig-lispify "starpu_cuda_copy_async_sync" 'function)) :int
+  (src_ptr :pointer)
+  (src_node :unsigned-int)
+  (dst_ptr :pointer)
+  (dst_node :unsigned-int)
+  (ssize :unsigned-long)
+  (stream :pointer)
+  (kind :pointer))
+
+(cffi:defcfun ("starpu_cuda_set_device" #.(swig-lispify "starpu_cuda_set_device" 'function)) :void
+  (devid :unsigned-int))
+
 (cffi:defcfun ("starpu_cublas_init" #.(swig-lispify "starpu_cublas_init" 'function)) :void)
 
 (cffi:defcfun ("starpu_cublas_set_stream" #.(swig-lispify "starpu_cublas_set_stream" 'function)) :void)
@@ -2038,6 +2067,8 @@
 (cffi:defcfun ("starpu_cusparse_init" #.(swig-lispify "starpu_cusparse_init" 'function)) :void)
 
 (cffi:defcfun ("starpu_cusparse_shutdown" #.(swig-lispify "starpu_cusparse_shutdown" 'function)) :void)
+
+(cffi:defcfun ("starpu_cusparse_get_local_handle" #.(swig-lispify "starpu_cusparse_get_local_handle" 'function)) :pointer)
 
 (cffi:defcfun ("starpu_bound_start" #.(swig-lispify "starpu_bound_start" 'function)) :void
   (deps :int)
@@ -2063,18 +2094,18 @@
   (output :pointer)
   (integer :int))
 
-(cffi:defcfun ("starpu_hash_crc32c_be_n" #.(swig-lispify "starpu_hash_crc32c_be_n" 'function)) :pointer
+(cffi:defcfun ("starpu_hash_crc32c_be_n" #.(swig-lispify "starpu_hash_crc32c_be_n" 'function)) :unsigned-int
   (input :pointer)
-  (n :pointer)
-  (inputcrc :pointer))
+  (n :unsigned-long)
+  (inputcrc :unsigned-int))
 
-(cffi:defcfun ("starpu_hash_crc32c_be" #.(swig-lispify "starpu_hash_crc32c_be" 'function)) :pointer
-  (input :pointer)
-  (inputcrc :pointer))
+(cffi:defcfun ("starpu_hash_crc32c_be" #.(swig-lispify "starpu_hash_crc32c_be" 'function)) :unsigned-int
+  (input :unsigned-int)
+  (inputcrc :unsigned-int))
 
-(cffi:defcfun ("starpu_hash_crc32c_string" #.(swig-lispify "starpu_hash_crc32c_string" 'function)) :pointer
+(cffi:defcfun ("starpu_hash_crc32c_string" #.(swig-lispify "starpu_hash_crc32c_string" 'function)) :unsigned-int
   (str :string)
-  (inputcrc :pointer))
+  (inputcrc :unsigned-int))
 
 (cffi:defcfun ("starpu_profiling_init" #.(swig-lispify "starpu_profiling_init" 'function)) :void)
 
