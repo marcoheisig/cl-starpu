@@ -3,7 +3,7 @@
 (defpackage #:cl-starpu
   (:nicknames #:starpu)
   (:use #:common-lisp)
-  (:shadow #:vector #:vectorp)
+  (:shadow #:vector #:vectorp #:block)
   (:export
    #:version
    #:initialize

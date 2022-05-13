@@ -4,14 +4,13 @@
             (:include data)
             (:constructor %make-matrix)))
 
-(defun make-matrix (nx ny &rest args &key element-type initial-element (row-padding 0))
-  (declare (ignore initial-element))
+(defun make-matrix (nx ny &rest args &key element-type initial-element)
   (multiple-value-bind (pointer foreign-type)
-      (apply #'starpu-allocate (list nx ny) args)
+      (starpu-allocate (list nx ny) :element-type element-type :initial-element initial-element)
     (let* ((element-size (cffi:foreign-type-size foreign-type))
            (handle
              (cffi:with-foreign-object (handle :pointer)
-               (%starpu-matrix-data-register handle +starpu-main-ram+ pointer row-padding nx ny element-size)
+               (%starpu-matrix-data-register handle +starpu-main-ram+ pointer 0 nx ny element-size)
                (cffi:mem-ref handle :pointer))))
       (trivial-garbage:finalize
        (%make-matrix

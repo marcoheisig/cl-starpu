@@ -22,5 +22,6 @@
    (:file "data")
    (:file "vector")
    (:file "matrix")
+   (:file "block")
    (:file "codelet")
    (:file "task")))
