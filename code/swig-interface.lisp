@@ -330,7 +330,7 @@
 (cffi:defcfun ("starpu_disk_register" #.(swig-lispify "starpu_disk_register" 'function)) :int
   (func :pointer)
   (parameter :pointer)
-  (size :pointer))
+  (size :long))
 
 (cffi:defcvar ("starpu_disk_swap_node" #.(swig-lispify "starpu_disk_swap_node" 'variable))
  :int)
@@ -962,15 +962,15 @@
   (addr :pointer)
   (size :unsigned-long))
 
-(cffi:defcfun ("starpu_memory_get_total" #.(swig-lispify "starpu_memory_get_total" 'function)) :pointer
+(cffi:defcfun ("starpu_memory_get_total" #.(swig-lispify "starpu_memory_get_total" 'function)) :long
   (node :unsigned-int))
 
-(cffi:defcfun ("starpu_memory_get_available" #.(swig-lispify "starpu_memory_get_available" 'function)) :pointer
+(cffi:defcfun ("starpu_memory_get_available" #.(swig-lispify "starpu_memory_get_available" 'function)) :long
   (node :unsigned-int))
 
-(cffi:defcfun ("starpu_memory_get_total_all_nodes" #.(swig-lispify "starpu_memory_get_total_all_nodes" 'function)) :pointer)
+(cffi:defcfun ("starpu_memory_get_total_all_nodes" #.(swig-lispify "starpu_memory_get_total_all_nodes" 'function)) :long)
 
-(cffi:defcfun ("starpu_memory_get_available_all_nodes" #.(swig-lispify "starpu_memory_get_available_all_nodes" 'function)) :pointer)
+(cffi:defcfun ("starpu_memory_get_available_all_nodes" #.(swig-lispify "starpu_memory_get_available_all_nodes" 'function)) :long)
 
 (cffi:defcfun ("starpu_memory_allocate" #.(swig-lispify "starpu_memory_allocate" 'function)) :int
   (node :unsigned-int)
@@ -1230,7 +1230,7 @@
 
 (cffi:defcfun ("starpu_worker_get_name" #.(swig-lispify "starpu_worker_get_name" 'function)) :void
   (id :int)
-  (dst :string)
+  (dst :pointer)
   (maxlen :unsigned-long))
 
 (cffi:defcfun ("starpu_worker_display_names" #.(swig-lispify "starpu_worker_display_names" 'function)) :void
@@ -1293,7 +1293,7 @@
 
 (cffi:defcfun ("starpu_memory_node_get_name" #.(swig-lispify "starpu_memory_node_get_name" 'function)) :int
   (node :unsigned-int)
-  (name :string)
+  (name :pointer)
   (size :unsigned-long))
 
 (cffi:defcfun ("starpu_memory_nodes_get_numa_count" #.(swig-lispify "starpu_memory_nodes_get_numa_count" 'function)) :int)

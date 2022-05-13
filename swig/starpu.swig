@@ -11,6 +11,7 @@
 %inline %{typedef unsigned int uint32_t; %}
 %inline %{typedef unsigned long int uint64_t; %}
 %inline %{typedef long unsigned int size_t; %}
+%inline %{typedef long int ssize_t; %}
 
 %include "starpu/1.3/starpu_config.h"
 %include "starpu/1.3/starpu_util.h"

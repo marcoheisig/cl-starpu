@@ -17,30 +17,36 @@
   (floor (%starpu-data-get-size (data-handle data))
          (cffi:foreign-type-size (data-foreign-type data))))
 
-(defun data-prefetch (data &key (node +starpu-main-ram+) (async t))
-  (%starpu-data-prefetch-on-node (data-handle data) node (if async 1 0)))
+(defun data-prefetch (data &key (memory-node *main-memory-node*) (async t))
+  (%starpu-data-prefetch-on-node
+   (data-handle data)
+   (memory-node-id memory-node)
+   (if async 1 0)))
 
-(defun data-fetch (data &key (node +starpu-main-ram+) (async t))
-  (%starpu-data-fetch-on-node (data-handle data) node (if async 1 0)))
+(defun data-fetch (data &key (memory-node *main-memory-node*) (async t))
+  (%starpu-data-fetch-on-node
+   (data-handle data)
+   (memory-node-id memory-node)
+   (if async 1 0)))
 
 (defun data-acquire
     (data &key
-            (node +starpu-main-ram+)
+            (memory-node *main-memory-node*)
             (mode :r)
             (callback (cffi:null-pointer))
             (arg (cffi:null-pointer)))
   (if (cffi:null-pointer-p callback)
-      (%starpu-data-acquire-on-node (data-handle data) node mode)
-      (%starpu-data-acquire-on-node-cb (data-handle data) node mode callback arg)))
+      (%starpu-data-acquire-on-node (data-handle data) (memory-node-id memory-node) mode)
+      (%starpu-data-acquire-on-node-cb (data-handle data) (memory-node-id memory-node) mode callback arg)))
 
 (defun data-release
-    (data &key (node +starpu-main-ram+))
-  (%starpu-data-release-on-node (data-handle data) node))
+    (data &key (memory-node *main-memory-node*))
+  (%starpu-data-release-on-node (data-handle data) (memory-node-id memory-node)))
 
 (defmacro with-acquired-data
-    ((data &rest args &key node mode callback arg sequential-consistency)
+    ((data &rest args &key memory-node mode callback arg sequential-consistency)
      &body body)
-  (declare (ignore node mode callback arg sequential-consistency))
+  (declare (ignore memory-node mode callback arg sequential-consistency))
   (alexandria:once-only (data)
     `(unwind-protect (progn (data-acquire ,data ,@args) ,@body)
        (data-release ,data))))

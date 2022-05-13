@@ -70,7 +70,9 @@
         (unless (zerop ret)
           (if (= ret (- +enodev+))
               (error 'no-worker-available :error-code ret)
-              (error 'starpu-error :error-code ret)))))))
+              (error 'starpu-error :error-code ret)))
+        ;; Initialize cl-starpu.
+        (setf *main-memory-node* (%make-memory-node +starpu-main-ram+))))))
 
 (defun shutdown ()
   (%starpu-shutdown))

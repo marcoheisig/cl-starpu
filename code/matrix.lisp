@@ -4,9 +4,9 @@
             (:include data)
             (:constructor %make-matrix)))
 
-(defun make-matrix (nx ny &rest args &key element-type initial-element)
+(defun make-matrix (nx ny &key element-type initial-element)
   (multiple-value-bind (pointer foreign-type)
-      (starpu-allocate (list nx ny) :element-type element-type :initial-element initial-element)
+      (allocate (list nx ny) :element-type element-type :initial-element initial-element)
     (let* ((element-size (cffi:foreign-type-size foreign-type))
            (handle
              (cffi:with-foreign-object (handle :pointer)
@@ -19,7 +19,7 @@
         :foreign-type foreign-type)
        (lambda ()
          (%starpu-data-unregister-no-coherency handle)
-         (starpu-free pointer))))))
+         (free pointer))))))
 
 (defun matrix-nx (matrix)
   (declare (matrix matrix))

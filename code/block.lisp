@@ -5,9 +5,8 @@
             (:constructor %make-block)))
 
 (defun make-block (nx ny nz &rest args &key element-type initial-element)
-  (declare (ignore initial-element))
   (multiple-value-bind (pointer foreign-type)
-      (apply #'starpu-allocate (list nx ny nz) args)
+      (allocate (list nx ny nz) :element-type element-type :initial-element initial-element)
     (let* ((element-size (cffi:foreign-type-size foreign-type))
            (handle
              (cffi:with-foreign-object (handle :pointer)
@@ -20,7 +19,7 @@
         :foreign-type foreign-type)
        (lambda ()
          (%starpu-data-unregister-no-coherency handle)
-         (starpu-free pointer))))))
+         (free pointer))))))
 
 (defun block-nx (block)
   (declare (block block))

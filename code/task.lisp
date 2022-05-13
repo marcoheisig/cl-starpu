@@ -148,7 +148,7 @@
              (push-arg :double value-sym))
             ((:execute-on-worker)
              (push-arg :int +starpu-execute-on-worker+)
-             (push-arg :int value-sym))
+             (push-arg :int `(worker-id ,value-sym)))
             ((:synchronous)
              (push-arg :int +starpu-task-synchronous+)
              (push-arg :int `(if ,value-sym 1 0)))
