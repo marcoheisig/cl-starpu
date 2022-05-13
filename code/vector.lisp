@@ -2,8 +2,7 @@
 
 (defstruct (vector
             (:include data)
-            (:constructor %make-vector)
-            (:constructor wrap-vector-handle (handle))))
+            (:constructor %make-vector)))
 
 (defun make-vector (length &rest args &key element-type initial-element)
   (declare (ignore initial-element))
@@ -24,13 +23,23 @@
          (starpu-free pointer))))))
 
 (defun vector-size (vector)
+  (declare (vector vector))
+  (%starpu-vector-get-nx (vector-handle vector)))
+
+(defun vector-nx (vector)
+  (declare (vector vector))
   (%starpu-vector-get-nx (vector-handle vector)))
 
 (defun vector-pointer (vector)
+  (declare (vector vector))
   (%starpu-vector-get-local-ptr (vector-handle vector)))
+
+(defun vector-contents (vector)
+  (declare (vector vector))
+  (data-storage-vector vector))
 
 (defmethod print-object ((vector vector) stream)
   (print-unreadable-object (vector stream :type t)
     (format stream "~@<~@{~S ~S~^ ~_~}~:>"
-            :size (vector-size vector)
-            :storage-vector (data-storage-vector vector))))
+            :nx (vector-nx vector)
+            :contents (vector-contents vector))))

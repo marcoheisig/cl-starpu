@@ -17,6 +17,12 @@
   (floor (%starpu-data-get-size (data-handle data))
          (cffi:foreign-type-size (data-foreign-type data))))
 
+(defun data-prefetch (data &key (node +starpu-main-ram+) (async t))
+  (%starpu-data-prefetch-on-node (data-handle data) node (if async 1 0)))
+
+(defun data-fetch (data &key (node +starpu-main-ram+) (async t))
+  (%starpu-data-fetch-on-node (data-handle data) node (if async 1 0)))
+
 (defun data-acquire
     (data &key
             (node +starpu-main-ram+)
@@ -40,6 +46,7 @@
        (data-release ,data))))
 
 (defun data-storage-vector (data)
+  "Returns the contents of DATA as a specialized vector."
   (with-acquired-data (data)
     (let* ((size (data-size data))
            (pointer (data-pointer data))
