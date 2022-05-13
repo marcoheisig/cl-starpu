@@ -17,6 +17,9 @@
   (floor (%starpu-data-get-size (data-handle data))
          (cffi:foreign-type-size (data-foreign-type data))))
 
+(defun data-element-size (data)
+  (cffi:foreign-type-size (data-foreign-type data)))
+
 (defun data-prefetch (data &key (memory-node *main-memory-node*) (async t))
   (%starpu-data-prefetch-on-node
    (data-handle data)
@@ -51,7 +54,7 @@
     `(unwind-protect (progn (data-acquire ,data ,@args) ,@body)
        (data-release ,data))))
 
-(defun data-storage-vector (data)
+(defun data-contents (data)
   "Returns the contents of DATA as a specialized vector."
   (with-acquired-data (data)
     (let* ((size (data-size data))

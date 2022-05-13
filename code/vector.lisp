@@ -4,8 +4,7 @@
             (:include data)
             (:constructor %make-vector)))
 
-(defun make-vector (length &rest args &key element-type initial-element)
-  (declare (ignore initial-element))
+(defun make-vector (length &key element-type initial-element)
   (multiple-value-bind (pointer foreign-type size)
       (allocate length :element-type element-type :initial-element initial-element)
     (let* ((element-size (cffi:foreign-type-size foreign-type))
@@ -26,17 +25,17 @@
   (declare (vector vector))
   (%starpu-vector-get-nx (vector-handle vector)))
 
-(defun vector-nx (vector)
-  (declare (vector vector))
-  (%starpu-vector-get-nx (vector-handle vector)))
-
 (defun vector-pointer (vector)
   (declare (vector vector))
   (%starpu-vector-get-local-ptr (vector-handle vector)))
 
+(defun vector-nx (vector)
+  (declare (vector vector))
+  (%starpu-vector-get-nx (vector-handle vector)))
+
 (defun vector-contents (vector)
   (declare (vector vector))
-  (data-storage-vector vector))
+  (data-contents vector))
 
 (defmethod print-object ((vector vector) stream)
   (print-unreadable-object (vector stream :type t)

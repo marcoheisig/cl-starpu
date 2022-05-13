@@ -41,7 +41,7 @@
    (list (matrix-nx matrix)
          (matrix-ny matrix))
    :element-type (matrix-element-type matrix)
-   :displaced-to (data-storage-vector matrix)))
+   :displaced-to (data-contents matrix)))
 
 (defmethod print-object ((matrix matrix) stream)
   (print-unreadable-object (matrix stream :type t)

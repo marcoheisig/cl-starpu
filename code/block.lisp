@@ -4,7 +4,7 @@
             (:include data)
             (:constructor %make-block)))
 
-(defun make-block (nx ny nz &rest args &key element-type initial-element)
+(defun make-block (nx ny nz &key element-type initial-element)
   (multiple-value-bind (pointer foreign-type)
       (allocate (list nx ny nz) :element-type element-type :initial-element initial-element)
     (let* ((element-size (cffi:foreign-type-size foreign-type))
@@ -47,7 +47,7 @@
          (block-ny block)
          (block-nz block))
    :element-type (block-element-type block)
-   :displaced-to (data-storage-vector block)))
+   :displaced-to (data-contents block)))
 
 (defmethod print-object ((block block) stream)
   (print-unreadable-object (block stream :type t)
