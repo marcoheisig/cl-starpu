@@ -4,20 +4,18 @@
   '(and unsigned-byte fixnum))
 
 (defparameter *foreign-type-lisp-type*
-  (loop for (foreign-type lisp-type)
-          in '((:char   (signed-byte 8))
-               (:uint8  (unsigned-byte 8))
-               (:uint16 (unsigned-byte 16))
-               (:uint32 (unsigned-byte 32))
-               (:uint64 (unsigned-byte 64))
-               (:int8   (signed-byte 8))
-               (:int16  (signed-byte 16))
-               (:int32  (signed-byte 32))
-               (:int64  (signed-byte 64))
-               (:float  single-float)
-               (:double double-float))
-        unless (eql (upgraded-array-element-type lisp-type) 't)
-          collect (list foreign-type lisp-type)))
+  `((:float  single-float)
+    (:double double-float)
+    ,@(loop for type in '(:char :short :int :long :long-long
+                          :int8 :int16 :int32 :int64)
+            collect `(,type (signed-byte ,(cffi:foreign-type-size type))))
+    ,@(loop for type in '(:unsigned-char :unsigned-short :unsigned-int
+                          :unsigned-long :unsigned-long-long
+                          :uint8 :uint16 :uint32 :uint64)
+            collect `(,type (unsigned-byte ,(cffi:foreign-type-size type))))))
+
+(defparameter *foreign-types*
+  (mapcar #'first *foreign-type-lisp-type*))
 
 (defun lisp-type-foreign-type (lisp-type)
   (loop for (foreign-type other-lisp-type) in *foreign-type-lisp-type* do

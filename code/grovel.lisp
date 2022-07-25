@@ -431,7 +431,9 @@
          (#.(swig-lispify "color" 'slotname) "color" :type :unsigned-int)
          (#.(swig-lispify "flags" 'slotname) "flags" :type :int))
 
-(cstruct #.(swig-lispify "starpu_data_descr" 'classname) "struct starpu_data_descr")
+(cstruct #.(swig-lispify "starpu_data_descr" 'classname) "struct starpu_data_descr"
+         (#.(swig-lispify "handle" 'slotname) "handle" :type :pointer)
+         (#.(swig-lispify "mode" 'slotname) "mode" :type #.(swig-lispify "starpu_data_access_mode" 'enumname)))
 
 (cstruct #.(swig-lispify "starpu_task" 'classname) "struct starpu_task"
          (#.(swig-lispify "name" 'slotname) "name" :type (:pointer :char))
