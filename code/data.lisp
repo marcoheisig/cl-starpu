@@ -5,32 +5,35 @@
   (handle (alexandria:required-argument :handle)
    :type cffi:foreign-pointer
    :read-only t)
-  (foreign-type nil
-   :read-only t)
-  (element-type nil
+  (contents (alexandria:required-argument :array)
+   :type array
    :read-only t))
 
-(defun data-pointer (data)
-  (%starpu-data-get-local-ptr (data-handle data)))
+(defun data-local-pointer (data)
+  (let* ((handle (data-handle data))
+         (pointer (%starpu-data-get-local-ptr handle)))
+    (when (cffi:null-pointer-p pointer)
+      (error "Data handle currently has no local pointer."))
+    ))
 
-(defun data-size (data)
+(defun data-total-size (data)
   (floor (%starpu-data-get-size (data-handle data))
-         (cffi:foreign-type-size (data-foreign-type data))))
+         (array-element-size (data-contents data))))
 
 (defun data-element-size (data)
-  (cffi:foreign-type-size (data-foreign-type data)))
+  (array-element-size (data-contents data)))
 
-(defun data-prefetch (data &key (memory-node *main-memory-node*) (async t))
+(defun data-prefetch (data &key (memory-node *main-memory-node*) (blocking nil))
   (%starpu-data-prefetch-on-node
    (data-handle data)
    (memory-node-id memory-node)
-   (if async 1 0)))
+   (if blocking 0 1)))
 
-(defun data-fetch (data &key (memory-node *main-memory-node*) (async t))
+(defun data-fetch (data &key (memory-node *main-memory-node*) (blocking t))
   (%starpu-data-fetch-on-node
    (data-handle data)
    (memory-node-id memory-node)
-   (if async 1 0)))
+   (if blocking 0 1)))
 
 (defun data-acquire
     (data &key
@@ -54,19 +57,6 @@
     `(unwind-protect (progn (data-acquire ,data ,@args) ,@body)
        (data-release ,data))))
 
-(defun data-contents (data)
-  "Returns the contents of DATA as a specialized vector."
-  (with-acquired-data (data)
-    (let* ((size (data-size data))
-           (pointer (data-pointer data))
-           (foreign-type (data-foreign-type data))
-           (element-type (foreign-type-lisp-type foreign-type))
-           (vector (make-array size :element-type element-type)))
-      (loop for index below size do
-        (setf (aref vector index)
-              (cffi:mem-aref pointer foreign-type index)))
-      vector)))
-
 (defmacro with-unpacked-arguments (cl-arg foreign-objects &body body)
   "Unpack the CL-ARGS argument to a codelet function according to the
 provided (NAME FOREIGN-TYPE) specification, and run BODY."
@@ -81,3 +71,9 @@ provided (NAME FOREIGN-TYPE) specification, and run BODY."
           ,@(loop for (name type) in foreign-objects
                   collect `(cffi:mem-ref ,name ,type))))
      ,@body))
+
+(defun data-partition (data filter)
+  )
+
+(defun data-unpartition (data &key (memory-node *main-memory-node*))
+  )

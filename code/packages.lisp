@@ -3,8 +3,13 @@
 (defpackage #:cl-starpu
   (:nicknames #:starpu)
   (:use #:common-lisp)
+  ;; StarPU's terminology sometimes conflicts with that of Common Lisp, so
+  ;; we have to shadow a few symbols.
   (:shadow #:vector #:vectorp #:block)
   (:export
+   ;; load-foreign-code
+   #:pkg-config
+   #:load-foreign-code
    ;; starpu.lisp
    #:version
    #:initialize
@@ -30,9 +35,12 @@
    #:mpi-ms-memory-node
    #:mpi-ms-memory-node-p
    #:*main-memory-node*
+   ;; malloc.lisp
    #:malloc
    #:free
-   #:allocate
+   #:make-pinned-array
+   #:pinned-array-data-pointer
+   #:array-element-size
    ;; worker.lisp
    #:worker
    #:workerp
@@ -86,6 +94,7 @@
    #:matrix-pointer
    #:matrix-nx
    #:matrix-ny
+   #:matrix-local-ld
    #:matrix-contents
    ;; block.lisp
    #:make-block
@@ -97,6 +106,8 @@
    #:block-nx
    #:block-ny
    #:block-nz
+   #:block-local-ldy
+   #:block-local-ldz
    #:block-contents
    ;; codelet.lisp
    #:make-codelet

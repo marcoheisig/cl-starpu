@@ -1,7 +1,5 @@
 (in-package #:cl-starpu)
 
-(defvar *ctx*) ; TODO
-
 (defun version ()
   (cffi:with-foreign-objects ((major :int)
                               (minor :int)
@@ -72,7 +70,8 @@
               (error 'no-worker-available :error-code ret)
               (error 'starpu-error :error-code ret)))
         ;; Initialize cl-starpu.
-        (setf *main-memory-node* (%make-memory-node +starpu-main-ram+))))))
+        (setf *main-memory-node* (%make-memory-node +starpu-main-ram+))
+        (values)))))
 
 (defun shutdown ()
   (%starpu-shutdown))

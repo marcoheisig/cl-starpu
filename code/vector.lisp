@@ -1,41 +1,43 @@
 (in-package #:cl-starpu)
 
+;;; The CL-STARPU package shadows the symbols VECTOR and VECTORP so that we
+;;; can keep StarPU's terminology.
+
 (defstruct (vector
             (:include data)
             (:constructor %make-vector)))
 
-(defun make-vector (length &key element-type initial-element)
-  (multiple-value-bind (pointer foreign-type size)
-      (allocate length :element-type element-type :initial-element initial-element)
-    (let* ((element-size (cffi:foreign-type-size foreign-type))
-           (handle
-             (cffi:with-foreign-object (handle :pointer)
-               (%starpu-vector-data-register handle +starpu-main-ram+ pointer size element-size)
-               (cffi:mem-ref handle :pointer))))
-      (trivial-garbage:finalize
-       (%make-vector
-        :handle handle
-        :element-type element-type
-        :foreign-type foreign-type)
-       (lambda ()
-         (%starpu-data-unregister-no-coherency handle)
-         (free pointer))))))
-
-(defun vector-size (vector)
-  (declare (vector vector))
-  (%starpu-vector-get-nx (vector-handle vector)))
-
-(defun vector-pointer (vector)
-  (declare (vector vector))
-  (%starpu-vector-get-local-ptr (vector-handle vector)))
+(defun make-vector
+    (&key
+       (nx (alexandria:required-argument :nx))
+       (element-type t)
+       (initial-element nil initial-element-supplied-p))
+  (let* ((array (apply #'make-pinned-array nx
+                       :element-type element-type
+                       (when initial-element-supplied-p `(:initial-element ,initial-element))))
+         (handle
+           (cffi:with-foreign-object (handle :pointer)
+             (%starpu-vector-data-register
+              handle
+              +starpu-main-ram+
+              (pinned-array-data-pointer array)
+              nx
+              (array-element-size array))
+             (cffi:mem-ref handle :pointer))))
+    (trivial-garbage:finalize
+     (%make-vector
+      :handle handle
+      :contents array)
+     (lambda ()
+       (%starpu-data-unregister-no-coherency handle)))))
 
 (defun vector-nx (vector)
   (declare (vector vector))
   (%starpu-vector-get-nx (vector-handle vector)))
 
-(defun vector-contents (vector)
+(defun vector-size (vector)
   (declare (vector vector))
-  (data-contents vector))
+  (vector-nx vector))
 
 (defmethod print-object ((vector vector) stream)
   (print-unreadable-object (vector stream :type t)
