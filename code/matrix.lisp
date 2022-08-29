@@ -23,12 +23,10 @@
               ld nx ny
               (array-element-size array))
              (cffi:mem-ref handle :pointer))))
-    (trivial-garbage:finalize
+    (register-data-finalizer
      (%make-matrix
       :handle handle
-      :contents array)
-     (lambda ()
-       (%starpu-data-unregister-no-coherency handle)))))
+      :contents array))))
 
 (defun matrix-nx (matrix)
   (declare (matrix matrix))
@@ -53,5 +51,5 @@
     (format stream "~@<~@{~S ~S~^ ~_~}~:>"
             :nx (matrix-nx matrix)
             :ny (matrix-ny matrix)
-            :ld (matrix-ld matrix)
+            :ld (matrix-local-ld matrix)
             :contents (matrix-contents matrix))))

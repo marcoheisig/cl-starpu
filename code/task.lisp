@@ -123,7 +123,7 @@
              (push-initform (form)
                (push form reversed-initforms))
              (push-foreign-object (var type &optional (count 1))
-               (push `(,var ,type ,count) reversed-foreign-objects)))
+               (push `(,var ',type ,count) reversed-foreign-objects)))
       (push-binding codelet `(codelet-handle ,codelet-form))
       (loop for rest = args then (cddr rest) until (null rest) do
         (unless (cdr rest)
@@ -151,17 +151,17 @@
                (push-foreign-object data '(:struct %starpu-data-descr) length)
                (push-initform
                 `(loop for ,index from 0 below ,length
-                       for ,rest = ,value then (cddr ,value) until (null ,rest)
+                       for ,rest = ,value then (cddr ,rest) until (null ,rest)
                        do (setf (cffi:foreign-slot-value
                               (cffi:mem-aptr ,data '(:struct %starpu-data-descr) ,index)
                               '(:struct %starpu-data-descr)
                                '%mode)
-                             (first rest))
-                       (setf (cffi:foreign-slot-value
+                             (first ,rest))
+                       do (setf (cffi:foreign-slot-value
                                  (cffi:mem-aptr ,data '(:struct %starpu-data-descr) ,index)
                                  '(:struct %starpu-data-descr)
-                                  '%handle)
-                                (data-handle (second rest)))))
+                                 '%handle)
+                                (data-handle (second ,rest)))))
                (push-arg :int +starpu-data-mode-array+)
                (push-arg :pointer data)
                (push-arg :int length)))

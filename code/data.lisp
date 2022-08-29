@@ -7,14 +7,21 @@
    :read-only t)
   (contents (alexandria:required-argument :array)
    :type array
-   :read-only t))
+   :read-only t)
+  ;; A cell whose CAR is set to :DEAD when the data is unregistered.  We
+  ;; need to put the state in a cell because we also want to use the state
+  ;; in the finalizer.
+  (state-cell (list :alive)))
 
 (defun data-local-pointer (data)
   (let* ((handle (data-handle data))
          (pointer (%starpu-data-get-local-ptr handle)))
     (when (cffi:null-pointer-p pointer)
       (error "Data handle currently has no local pointer."))
-    ))
+    pointer))
+
+(defun data-bytes (data)
+  (%starpu-data-get-size (data-handle data)))
 
 (defun data-total-size (data)
   (floor (%starpu-data-get-size (data-handle data))
@@ -48,6 +55,34 @@
 (defun data-release
     (data &key (memory-node *main-memory-node*))
   (%starpu-data-release-on-node (data-handle data) (memory-node-id memory-node)))
+
+(defun data-unregister (data)
+  (let ((state-cell (data-state-cell data)))
+    (ecase (car state-cell)
+      (:alive
+       (when (atomics:cas (car state-cell) :alive :dead)
+         (%starpu-data-unregister (data-handle data))))
+      (:dead))))
+
+(defun data-unregister-no-coherency (data)
+  (let ((state-cell (data-state-cell data)))
+    (ecase (car state-cell)
+      (:alive
+       (when (atomics:cas (car state-cell) :alive :dead)
+         (%starpu-data-unregister-no-coherency (data-handle data))))
+      (:dead))))
+
+(defun register-data-finalizer (data)
+  (let ((state-cell (data-state-cell data))
+        (handle (data-handle data)))
+    (trivial-garbage:finalize
+     data
+     (lambda ()
+       (ecase (car state-cell)
+         (:alive
+          (when (atomics:cas (car state-cell) :alive :dead)
+            (%starpu-data-unregister-no-coherency handle)))
+         (:dead))))))
 
 (defmacro with-acquired-data
     ((data &rest args &key memory-node mode callback arg sequential-consistency)

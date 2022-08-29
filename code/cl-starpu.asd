@@ -7,6 +7,7 @@
   :depends-on
   ("alexandria"
    "bordeaux-threads"
+   "atomics"
    "cffi"
    "split-sequence"
    "static-vectors"

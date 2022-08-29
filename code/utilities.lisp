@@ -5,7 +5,9 @@
 
 (defparameter *foreign-type-lisp-type*
   `((:float  single-float)
+    (:float  short-float)
     (:double double-float)
+    (:double long-float)
     ,@(loop for type in '(:char :short :int :long :long-long
                           :int8 :int16 :int32 :int64)
             collect `(,type (signed-byte ,(cffi:foreign-type-size type))))
@@ -15,7 +17,8 @@
             collect `(,type (unsigned-byte ,(cffi:foreign-type-size type))))))
 
 (defparameter *foreign-types*
-  (mapcar #'first *foreign-type-lisp-type*))
+  (remove-duplicates
+   (mapcar #'first *foreign-type-lisp-type*)))
 
 (defun lisp-type-foreign-type (lisp-type)
   (loop for (foreign-type other-lisp-type) in *foreign-type-lisp-type* do

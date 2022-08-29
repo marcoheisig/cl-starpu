@@ -18,6 +18,7 @@
    #:pause
    #:resume
    #:shutdown
+   #:with-starpu-activity
    ;; memory-node.lisp
    #:memory-node
    #:memory-node-p
@@ -67,13 +68,16 @@
    #:datap
    #:data-foreign-type
    #:data-element-type
-   #:data-size
-   #:data-pointer
+   #:data-bytes
+   #:data-total-size
+   #:data-local-pointer
    #:data-contents
    #:data-prefetch
    #:data-fetch
    #:data-acquire
    #:data-release
+   #:data-unregister
+   #:data-unregister-no-coherency
    #:with-acquired-data
    #:with-unpacked-arguments
    ;; vector.lisp

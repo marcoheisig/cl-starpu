@@ -13,15 +13,6 @@
 (defun initializedp ()
   (not (zerop (%starpu-is-initialized))))
 
-(defun pause ()
-  (%starpu-pause))
-
-(defun resume ()
-  (%starpu-resume))
-
-(defun wait-initialized ()
-  (%starpu-wait-initialized))
-
 (defun initialize
     (&key ncpus reserve-ncpus ncuda nopencl nmic nmpi-ms bus-calibrate calibrate
        single-combined-worker
@@ -75,3 +66,31 @@
 
 (defun shutdown ()
   (%starpu-shutdown))
+
+(defun wait-initialized ()
+  (%starpu-wait-initialized))
+
+(let ((lock (bordeaux-threads:make-lock "StarPU Activity Lock"))
+      (count 1))
+  (defun pause ()
+    "Decrement the number of StarPU users by one.  If the number of users
+reaches zero, pause all StarPU activity."
+    (bordeaux-threads:with-lock-held (lock)
+      (case (decf count)
+        (0 (%starpu-pause))
+        (-1 (error "Must not pause StarPU more than once.")))))
+
+  (defun resume ()
+    "Resume StarPU activity."
+    (bordeaux-threads:with-lock-held (lock)
+      (when (= 1 (incf count))
+        (%starpu-resume)))))
+
+(defmacro with-starpu-activity (&body body)
+  "Ensure StarPU is not paused while evaluating BODY."
+  `(call-with-starpu-activity (lambda () ,@body)))
+
+(defun call-with-starpu-activity (thunk)
+  (resume)
+  (unwind-protect (funcall thunk)
+    (pause)))

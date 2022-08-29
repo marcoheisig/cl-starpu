@@ -51,8 +51,9 @@ int cl_starpu_free(unsigned node, void* ptr, size_t size, int flags) {
 
 (defun malloc (n)
   (cffi:with-foreign-object (pointer :pointer)
-    (unless (zerop (%starpu-malloc pointer n))
-      (error "Call to (malloc ~D) failed." n))
+    (let ((err (%starpu-malloc pointer n)))
+      (unless (zerop err)
+        (error "Call to (malloc ~D) failed with exit code ~D." n err)))
     (cffi:mem-ref pointer :pointer)))
 
 (defun free (pointer)
@@ -93,7 +94,7 @@ int cl_starpu_free(unsigned node, void* ptr, size_t size, int flags) {
 
 (defun pinned-array-data-pointer (array)
   (static-vectors:static-vector-pointer
-   (sb-vm::%array-data array)))
+   (sb-vm::%data-vector-and-index array 0)))
 
 #+sbcl
 (let ((cache (make-array 128 :element-type '(unsigned-byte 8) :initial-element 0)))
