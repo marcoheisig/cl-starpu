@@ -39,7 +39,6 @@
    ;; malloc.lisp
    #:malloc
    #:free
-   #:make-pinned-array
    #:pinned-array-data-pointer
    #:array-element-size
    ;; worker.lisp
