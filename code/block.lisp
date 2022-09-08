@@ -7,6 +7,23 @@
             (:include data)
             (:constructor %make-block)))
 
+(defun make-displaced-block (array)
+  (declare (array array))
+  (let* ((nz (array-dimension array 0))
+         (ny (array-dimension array 1))
+         (nx (/ (array-total-size array) ny nz))
+         (ldy nx)
+         (ldz (* nx ny))
+         (data (pinned-array-data-pointer array))
+         (size (array-element-size array)))
+    (register-data-finalizer
+     (%make-block
+      :contents array
+      :handle
+      (cffi:with-foreign-object (handle :pointer)
+        (%starpu-block-data-register handle +starpu-main-ram+ data ldy ldz nx ny nz size)
+        (cffi:mem-ref handle :pointer))))))
+
 (defun make-block
     (&key
        (nx (alexandria:required-argument :nx))
@@ -14,24 +31,13 @@
        (nz (alexandria:required-argument :nz))
        (ldy nx)
        (ldz (* nx ny))
-       (element-type t)
-       (initial-element nil initial-element-supplied-p))
-  (let* ((array (apply #'make-pinned-array (list nx ny nz)
-                       :element-type element-type
-                       (when initial-element-supplied-p `(:initial-element ,initial-element))))
-         (handle
-           (cffi:with-foreign-object (handle :pointer)
-             (%starpu-block-data-register
-              handle
-              +starpu-main-ram+
-              (pinned-array-data-pointer array)
-              ldy ldz nx ny nz
-              (array-element-size array))
-             (cffi:mem-ref handle :pointer))))
-    (register-data-finalizer
-     (%make-block
-      :handle handle
-      :contents array))))
+       (size (alexandria:required-argument :size)))
+  (register-data-finalizer
+   (%make-block
+    :handle
+    (cffi:with-foreign-object (handle :pointer)
+      (%starpu-block-data-register handle -1 (cffi:null-pointer) ldy ldz nx ny nz size)
+      (cffi:mem-ref handle :pointer)))))
 
 (defun block-local-ldy (block)
   (declare (block block))

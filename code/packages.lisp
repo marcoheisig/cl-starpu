@@ -66,10 +66,7 @@
    ;; data.lisp
    #:data
    #:datap
-   #:data-foreign-type
-   #:data-element-type
-   #:data-bytes
-   #:data-total-size
+   #:data-size-in-bytes
    #:data-local-pointer
    #:data-contents
    #:data-prefetch
@@ -82,6 +79,7 @@
    #:with-unpacked-arguments
    ;; vector.lisp
    #:make-vector
+   #:make-displaced-vector
    #:vector
    #:vectorp
    #:vector-size
@@ -91,6 +89,7 @@
    #:vector-contents
    ;; matrix.lisp
    #:make-matrix
+   #:make-displaced-matrix
    #:matrix
    #:matrixp
    #:matrix-size
@@ -102,6 +101,7 @@
    #:matrix-contents
    ;; block.lisp
    #:make-block
+   #:make-displaced-block
    #:block
    #:blockp
    #:block-size

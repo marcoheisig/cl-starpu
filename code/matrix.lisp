@@ -4,29 +4,33 @@
             (:include data)
             (:constructor %make-matrix)))
 
+(defun make-displaced-matrix (array)
+  (declare (array array))
+  (let* ((ny (array-dimension array 0))
+         (nx (array-dimension array 1))
+         (ld nx)
+         (data (pinned-array-data-pointer array))
+         (size (array-element-size array)))
+    (register-data-finalizer
+     (%make-matrix
+      :contents array
+      :handle
+      (cffi:with-foreign-object (handle :pointer)
+        (%starpu-matrix-data-register handle +starpu-main-ram+ data ld nx ny size)
+        (cffi:mem-ref handle :pointer))))))
+
 (defun make-matrix
     (&key
        (nx (alexandria:required-argument :nx))
        (ny (alexandria:required-argument :ny))
        (ld nx)
-       (element-type t)
-       (initial-element nil initial-element-supplied-p))
-  (let* ((array (apply #'make-pinned-array (list nx ny)
-                       :element-type element-type
-                       (when initial-element-supplied-p `(:initial-element ,initial-element))))
-         (handle
-           (cffi:with-foreign-object (handle :pointer)
-             (%starpu-matrix-data-register
-              handle
-              +starpu-main-ram+
-              (pinned-array-data-pointer array)
-              ld nx ny
-              (array-element-size array))
-             (cffi:mem-ref handle :pointer))))
-    (register-data-finalizer
-     (%make-matrix
-      :handle handle
-      :contents array))))
+       (size (alexandria:required-argument :size)))
+  (register-data-finalizer
+   (%make-matrix
+    :handle
+    (cffi:with-foreign-object (handle :pointer)
+      (%starpu-matrix-data-register handle -1 (cffi:null-pointer) ld nx ny size)
+      (cffi:mem-ref handle :pointer)))))
 
 (defun matrix-nx (matrix)
   (declare (matrix matrix))

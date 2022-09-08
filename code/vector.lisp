@@ -7,27 +7,29 @@
             (:include data)
             (:constructor %make-vector)))
 
+(defun make-displaced-vector (array)
+  (declare (array array))
+  (let* ((nx (array-total-size array))
+         (data (pinned-array-data-pointer array))
+         (size (array-element-size array)))
+    (register-data-finalizer
+     (%make-vector
+      :contents array
+      :handle
+      (cffi:with-foreign-object (handle :pointer)
+        (%starpu-vector-data-register handle +starpu-main-ram+ data nx size)
+        (cffi:mem-ref handle :pointer))))))
+
 (defun make-vector
     (&key
        (nx (alexandria:required-argument :nx))
-       (element-type t)
-       (initial-element nil initial-element-supplied-p))
-  (let* ((array (apply #'make-pinned-array nx
-                       :element-type element-type
-                       (when initial-element-supplied-p `(:initial-element ,initial-element))))
-         (handle
-           (cffi:with-foreign-object (handle :pointer)
-             (%starpu-vector-data-register
-              handle
-              +starpu-main-ram+
-              (pinned-array-data-pointer array)
-              nx
-              (array-element-size array))
-             (cffi:mem-ref handle :pointer))))
-    (register-data-finalizer
-     (%make-vector
-      :handle handle
-      :contents array))))
+       (size (alexandria:required-argument :size)))
+  (register-data-finalizer
+   (%make-vector
+    :handle
+    (cffi:with-foreign-object (handle :pointer)
+      (%starpu-vector-data-register handle -1 (cffi:null-pointer) nx size)
+      (cffi:mem-ref handle :pointer)))))
 
 (defun vector-nx (vector)
   (declare (vector vector))

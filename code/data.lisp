@@ -5,8 +5,8 @@
   (handle (alexandria:required-argument :handle)
    :type cffi:foreign-pointer
    :read-only t)
-  (contents (alexandria:required-argument :array)
-   :type array
+  (contents nil
+   :type (or array null)
    :read-only t)
   ;; A cell whose CAR is set to :DEAD when the data is unregistered.  We
   ;; need to put the state in a cell because we also want to use the state
@@ -20,15 +20,8 @@
       (error "Data handle currently has no local pointer."))
     pointer))
 
-(defun data-bytes (data)
+(defun data-size-in-bytes (data)
   (%starpu-data-get-size (data-handle data)))
-
-(defun data-total-size (data)
-  (floor (%starpu-data-get-size (data-handle data))
-         (array-element-size (data-contents data))))
-
-(defun data-element-size (data)
-  (array-element-size (data-contents data)))
 
 (defun data-prefetch (data &key (memory-node *main-memory-node*) (blocking nil))
   (%starpu-data-prefetch-on-node
