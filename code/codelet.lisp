@@ -44,6 +44,9 @@
 (defmacro codelet-handle-type (handle)
   `(codelet-handle-slot-ref ,handle '%type))
 
+(defmacro codelet-handle-flags (handle)
+  `(codelet-handle-slot-ref ,handle '%flags))
+
 (defmacro codelet-handle-max-parallelism (handle)
   `(codelet-handle-slot-ref ,handle '%max-parallelism))
 
@@ -67,6 +70,12 @@
 
 (defmacro codelet-handle-opencl-func (handle index)
   `(codelet-handle-slot-aref ,handle '%opencl-funcs :pointer ,index))
+
+(defmacro codelet-handle-cuda-flag (handle index)
+  `(codelet-handle-slot-aref ,handle '%cuda-flags :char ,index))
+
+(defmacro codelet-handle-opencl-flag (handle index)
+  `(codelet-handle-slot-aref ,handle '%opencl-flags :char ,index))
 
 (defmacro codelet-handle-nbuffers (handle)
   `(codelet-handle-slot-ref ,handle '%nbuffers))
@@ -163,12 +172,19 @@
        (max-parallelism nil max-parallelism-supplied-p)
        (modes '())
        (type :seq)
+       (flags 0)
        . #.
        (loop for index below +starpu-maximplementations+
              collect (intern (format nil "CPU-FUNC-~D" index) *package*)
              collect (intern (format nil "CUDA-FUNC-~D" index) *package*)
-             collect (intern (format nil "OPENCL-FUNC-~D" index) *package*)))
-  (check-type name symbol)
+             collect (intern (format nil "CUDA-FLAGS-~D" index) *package*)
+             collect (intern (format nil "OPENCL-FUNC-~D" index) *package*)
+             collect (intern (format nil "OPENCL-FLAGS-~D" index) *package*)))
+  (declare (type symbol name)
+           (type (or null (unsigned-byte 31)) max-parallelism)
+           (type list modes)
+           (type (member :seq :spmd :forkjoin) type)
+           (type (signed-byte 32) flags))
   (let ((handle (cffi:foreign-alloc '(:struct %starpu-codelet)))
         (nbuffers (length modes)))
     (%starpu-codelet-init handle)
@@ -178,6 +194,7 @@
               (cffi:foreign-string-alloc (string-from-symbol name))))
     (setf (codelet-handle-type handle) type)
     (setf (codelet-handle-nbuffers handle) nbuffers)
+    (setf (codelet-handle-flags handle) flags)
     (when max-parallelism-supplied-p
       (setf (codelet-handle-max-parallelism handle) max-parallelism))
     (let ((modes* (if (<= nbuffers +starpu-nmaxbufs+)
@@ -202,7 +219,15 @@
             collect
             (let ((arg (intern (format nil "OPENCL-FUNC-~D" index) *package*)))
               `(unless (null ,arg)
-                 (setf (codelet-handle-opencl-func handle ,index) ,arg)))))
+                 (setf (codelet-handle-opencl-func handle ,index) ,arg)))
+            collect
+            (let ((arg (intern (format nil "CUDA-FLAGS-~D" index) *package*)))
+              `(unless (null ,arg)
+                 (setf (codelet-handle-cuda-flag handle ,index) ,arg)))
+            collect
+            (let ((arg (intern (format nil "OPENCL-FLAGS-~D" index) *package*)))
+              `(unless (null ,arg)
+                 (setf (codelet-handle-opencl-flag handle ,index) ,arg)))))
     (trivial-garbage:finalize
      (funcall
       (ecase type

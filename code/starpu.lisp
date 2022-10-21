@@ -27,7 +27,7 @@
       (setf (cffi:foreign-slot-value conf '(:struct %starpu-conf) '%catch-signals) 0)
       ;; Set the scheduler. TODO make this configurable
       (setf (cffi:foreign-slot-value conf '(:struct %starpu-conf) '%sched-policy-name)
-            (cffi:foreign-string-alloc "eager"))
+            (cffi:foreign-string-alloc "dmdas"))
       ;; Process all keyword options.
       (macrolet ((process-unsigned-byte-option (variable slot)
                    `(etypecase ,variable

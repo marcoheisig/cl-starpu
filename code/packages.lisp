@@ -74,6 +74,7 @@
    #:data-release
    #:data-unregister
    #:data-unregister-no-coherency
+   #:data-invalidate
    #:with-acquired-data
    #:with-unpacked-arguments
    ;; vector.lisp
@@ -128,6 +129,8 @@
    #:codelet-nbuffers
    #:codelet-mode
    #:codelet-modes
+   #:+starpu-cuda-async+
+   #:+starpu-opencl-async+
    ;; task.lisp
    #:make-task
    #:task

@@ -65,6 +65,9 @@
          (%starpu-data-unregister-no-coherency (data-handle data))))
       (:dead))))
 
+(defun data-invalidate (data)
+  (%starpu-data-invalidate (data-handle data)))
+
 (defun register-data-finalizer (data)
   (let ((state-cell (data-state-cell data))
         (handle (data-handle data)))
