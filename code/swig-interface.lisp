@@ -1190,11 +1190,7 @@
 
 (cffi:defcfun ("starpu_opencl_worker_get_count" #.(swig-lispify "starpu_opencl_worker_get_count" 'function)) :unsigned-int)
 
-(cffi:defcfun ("starpu_mic_worker_get_count" #.(swig-lispify "starpu_mic_worker_get_count" 'function)) :unsigned-int)
-
 (cffi:defcfun ("starpu_mpi_ms_worker_get_count" #.(swig-lispify "starpu_mpi_ms_worker_get_count" 'function)) :unsigned-int)
-
-(cffi:defcfun ("starpu_mic_device_get_count" #.(swig-lispify "starpu_mic_device_get_count" 'function)) :unsigned-int)
 
 (cffi:defcfun ("starpu_worker_get_id" #.(swig-lispify "starpu_worker_get_id" 'function)) :int)
 
@@ -2336,8 +2332,6 @@
 (cffi:defcfun ("starpu_asynchronous_cuda_copy_disabled" #.(swig-lispify "starpu_asynchronous_cuda_copy_disabled" 'function)) :int)
 
 (cffi:defcfun ("starpu_asynchronous_opencl_copy_disabled" #.(swig-lispify "starpu_asynchronous_opencl_copy_disabled" 'function)) :int)
-
-(cffi:defcfun ("starpu_asynchronous_mic_copy_disabled" #.(swig-lispify "starpu_asynchronous_mic_copy_disabled" 'function)) :int)
 
 (cffi:defcfun ("starpu_asynchronous_mpi_ms_copy_disabled" #.(swig-lispify "starpu_asynchronous_mpi_ms_copy_disabled" 'function)) :int)
 

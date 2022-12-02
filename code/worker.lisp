@@ -24,11 +24,6 @@
             (:constructor %make-opencl-worker (id))
             (:predicate opencl-worker-p)))
 
-(defstruct (mic-worker
-            (:include worker)
-            (:constructor %make-mic-worker (id))
-            (:predicate mic-worker-p)))
-
 (defstruct (mpi-ms-worker
             (:include worker)
             (:constructor %make-mpi-ms-worker (id))
@@ -81,9 +76,6 @@
 
 (defun all-opencl-workers ()
   (all-workers-with-type :opencl-worker))
-
-(defun all-mic-workers ()
-  (all-workers-with-type :mic-worker))
 
 (defun all-mpi-ms-workers ()
   (all-workers-with-type :mpi-ms-worker))

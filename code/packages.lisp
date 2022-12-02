@@ -31,8 +31,6 @@
    #:opencl-memory-node-p
    #:disk-memory-node
    #:disk-memory-node-p
-   #:mic-memory-node
-   #:mic-memory-node-p
    #:mpi-ms-memory-node
    #:mpi-ms-memory-node-p
    #:*main-memory-node*
@@ -52,15 +50,12 @@
    #:cuda-worker-p
    #:opencl-worker
    #:opencl-worker-p
-   #:mic-worker
-   #:mic-worker-p
    #:mpi-ms-worker
    #:mpi-ms-worker-p
    #:all-workers
    #:all-cpu-workers
    #:all-cuda-workers
    #:all-opencl-workers
-   #:all-mic-workers
    #:all-mpi-ms-workers
    ;; data.lisp
    #:data

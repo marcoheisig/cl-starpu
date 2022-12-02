@@ -33,11 +33,6 @@
             (:constructor %make-disk-memory-node (id))
             (:predicate disk-memory-node-p)))
 
-(defstruct (mic-memory-node
-            (:include memory-node)
-            (:constructor %make-mic-memory-node (id))
-            (:predicate mic-memory-node-p)))
-
 (defstruct (mpi-ms-memory-node
             (:include memory-node)
             (:constructor %make-mpi-ms-memory-node (id))
@@ -54,7 +49,6 @@
      (:cuda-ram (%make-cuda-memory-node id))
      (:opencl-ram (%make-opencl-memory-node id))
      (:disk-ram (%make-disk-memory-node id))
-     (:mic-ram (%make-mic-memory-node id))
      (:mpi-ms-ram (%make-mpi-ms-memory-node id)))))
 
 (defun memory-node-name (memory-node &aux (max-chars 100))

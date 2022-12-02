@@ -72,8 +72,6 @@
 
 (constant (#.(swig-lispify "STARPU_MAXOPENCLDEVS" 'constant) "STARPU_MAXOPENCLDEVS"))
 
-(constant (#.(swig-lispify "STARPU_MAXMICDEVS" 'constant) "STARPU_MAXMICDEVS"))
-
 (constant (#.(swig-lispify "STARPU_NMAXWORKERS" 'constant) "STARPU_NMAXWORKERS"))
 
 (constant (#.(swig-lispify "STARPU_NMAX_SCHED_CTXS" 'constant) "STARPU_NMAX_SCHED_CTXS"))
@@ -159,8 +157,6 @@
 (constant (#.(swig-lispify "STARPU_CUDA" 'constant) "STARPU_CUDA"))
 
 (constant (#.(swig-lispify "STARPU_OPENCL" 'constant) "STARPU_OPENCL"))
-
-(constant (#.(swig-lispify "STARPU_MIC" 'constant) "STARPU_MIC"))
 
 (constant (#.(swig-lispify "STARPU_MPI_MS" 'constant) "STARPU_MPI_MS"))
 
@@ -359,14 +355,12 @@
        ((:cuda-ram "STARPU_CUDA_RAM"))
        ((:opencl-ram "STARPU_OPENCL_RAM"))
        ((:disk-ram "STARPU_DISK_RAM"))
-       ((:mic-ram "STARPU_MIC_RAM"))
        ((:mpi-ms-ram "STARPU_MPI_MS_RAM")))
 
 (cenum #.(swig-lispify "starpu_worker_archtype" 'enumname)
        ((:cpu-worker "STARPU_CPU_WORKER"))
        ((:cuda-worker "STARPU_CUDA_WORKER"))
        ((:opencl-worker "STARPU_OPENCL_WORKER"))
-       ((:mic-worker "STARPU_MIC_WORKER"))
        ((:mpi-ms-worker "STARPU_MPI_MS_WORKER"))
        ((:any-worker "STARPU_ANY_WORKER")))
 
@@ -501,7 +495,6 @@
          (#.(swig-lispify "reserve_ncpus" 'slotname) "reserve_ncpus" :type :int)
          (#.(swig-lispify "ncuda" 'slotname) "ncuda" :type :int)
          (#.(swig-lispify "nopencl" 'slotname) "nopencl" :type :int)
-         (#.(swig-lispify "nmic" 'slotname) "nmic" :type :int)
          (#.(swig-lispify "nmpi_ms" 'slotname) "nmpi_ms" :type :int)
          (#.(swig-lispify "bus_calibrate" 'slotname) "bus_calibrate" :type :int)
          (#.(swig-lispify "calibrate" 'slotname) "calibrate" :type :int)
@@ -510,7 +503,6 @@
          (#.(swig-lispify "disable_asynchronous_copy" 'slotname) "disable_asynchronous_copy" :type :int)
          (#.(swig-lispify "disable_asynchronous_cuda_copy" 'slotname) "disable_asynchronous_copy" :type :int)
          (#.(swig-lispify "disable_asynchronous_opencl_copy" 'slotname) "disable_asynchronous_copy" :type :int)
-         (#.(swig-lispify "disable_asynchronous_mic_copy" 'slotname) "disable_asynchronous_copy" :type :int)
          (#.(swig-lispify "catch_signals" 'slotname) "catch_signals" :type :int))
 
 (cstruct #.(swig-lispify "starpu_data_handle" 'classname) "starpu_data_handle_t")
